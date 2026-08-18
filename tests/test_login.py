@@ -2,14 +2,32 @@ import pytest
 from playwright.sync_api import Page, expect
 from pages.login_page import LoginPage
 from pages.register_page import RegisterPage
+from config import BASE_URL
+from models.user import User
 
 @pytest.mark.smoke
 def test_valid_login(page: Page):
     login_page = LoginPage(page)
     login_page.open()
+
     login_page.login("test@example.com", "password123")
+
     expect(login_page.header.avatar_button).to_be_visible()
     assert page.evaluate("localStorage.getItem('token')")
+
+@pytest.mark.api
+def test_valid_answer_api(page: Page):
+    login_page = LoginPage(page)
+    login_page.open()
+
+    login_page.login("test@example.com", "password123")
+
+    expect(login_page.header.avatar_button).to_be_visible()
+    token = page.evaluate("localStorage.getItem('token')")
+    assert token
+
+    request = page.request.get(f"https://archiscope.ru/api/users/me", headers={'Authorization': f'Bearer {token}'}).json()
+    assert User(**request)
 
 @pytest.mark.regression
 def test_invalid_login(page: Page):
