@@ -26,7 +26,7 @@ def test_valid_answer_me_api(page: Page):
     token = page.evaluate("localStorage.getItem('token')")
     assert token
 
-    request = page.request.get(f"https://archiscope.ru/api/users/me", headers={'Authorization': f'Bearer {token}'}).json()
+    request = page.request.get("https://archiscope.ru/api/users/me", headers={'Authorization': f'Bearer {token}'}).json()
     assert User(**request)
 
 @pytest.mark.api
