@@ -15,3 +15,16 @@ def test_invalid_login(page: Page):
     login_page.open()
     login_page.login("wrong@example.com", "wpassword")
     expect(page.get_by_text("Incorrect email or password")).to_be_visible()
+
+@pytest.mark.parametrize("empty_field", ["email", "password"])
+def test_empty_fields_login(page: Page, empty_field):
+    login_page = LoginPage(page)
+    login_page.open()
+
+    if empty_field == "email":
+        login_page.login("", "password123")
+    elif empty_field == "password":
+        login_page.login("test@example.com", "")
+
+    validate_locator = getattr(login_page, f"{empty_field}_input")
+    assert login_page.is_field_required(validate_locator)

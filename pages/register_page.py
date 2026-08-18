@@ -27,5 +27,5 @@ class RegisterPage(BasePage):
             self.phone_input.fill(phone)
         self.register_button.click()
 
-    def is_value_invalid(self, locator) -> bool:
+    def is_field_required(self, locator) -> bool:
         return locator.evaluate("el => !el.checkValidity()")

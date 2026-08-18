@@ -23,5 +23,8 @@ class LoginPage(BasePage):
     def get_error_message(self) -> str:
         return self.page.get_by_text("Incorrect email or password").text_content()
 
+    def is_field_required(self, locator) -> bool:
+        return locator.evaluate("el => !el.checkValidity()")
+
     def go_to_register(self):
         self.register_link.click()

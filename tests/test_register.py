@@ -24,7 +24,7 @@ def test_empty_fields_register(page: Page, empty_field):
     user[empty_field] = ""
     register_page.register(**user)
     validate_locator = getattr(register_page, f"{empty_field}_input")
-    assert register_page.is_value_invalid(validate_locator)
+    assert register_page.is_field_required(validate_locator)
 
 @pytest.mark.parametrize("invalid_email", ["qwe@qwe", "qwe@qwecom"])
 def test_invalid_fields_register(page: Page, invalid_email):
