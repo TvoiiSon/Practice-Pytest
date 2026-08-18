@@ -13,6 +13,7 @@ class RegisterPage(BasePage):
         self.password_input = page.locator('input[name="password"]')
         self.phone_input = page.locator('input[name="phone"]')
         self.register_button = page.get_by_role("button", name="Зарегистрироваться")
+        self.to_login_button = page.get_by_role("paragraph").get_by_role("link", name="Войти")
 
     def open(self):
         self.page.goto(self.URL)
@@ -29,3 +30,6 @@ class RegisterPage(BasePage):
 
     def is_field_required(self, locator) -> bool:
         return locator.evaluate("el => !el.checkValidity()")
+
+    def go_to_login(self):
+        self.to_login_button.click()
