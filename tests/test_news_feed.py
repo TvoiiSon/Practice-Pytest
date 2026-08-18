@@ -2,6 +2,7 @@ import pytest
 from playwright.sync_api import Page, expect
 from pages.news_feed_page import NewsFeedPage
 from pages.article_page import ArticlePage
+from models.article import Article
 
 @pytest.mark.regression
 def test_correct_count_news(page: Page):
@@ -30,3 +31,13 @@ def test_correct_redirect_article(page: Page):
     article_page = ArticlePage(page, title_article)
 
     expect(article_page.heading).to_be_visible()
+
+@pytest.mark.api
+def test_correct_answer_api_article(page: Page):
+    request = page.request.get(f"https://archiscope.ru/api/news/?page=1&per_page=1").json()
+    
+    assert Article(**request["items"][0])
+
+@pytest.mark.api
+def test_incorrect_answer_api_article(page: Page):
+    pass
