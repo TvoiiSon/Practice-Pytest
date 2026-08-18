@@ -1,5 +1,6 @@
 from playwright.sync_api import Page
 from pages.base_page import BasePage
+from config import BASE_URL
 
 class CreateNewsPage(BasePage):
     def __init__(self, page: Page):
@@ -8,13 +9,23 @@ class CreateNewsPage(BasePage):
         self.subtitle_input = page.locator('input[name="subtitle"]')
         self.text_input = page.locator('textarea[name="text"]')
         self.tags_input = page.get_by_role("textbox", name="технологии, наука, спорт")
+        self.image_input = page.locator('input[type="file"]')
         self.create_button = page.get_by_role("button", name="Создать")
 
-    def create_news(self, title: str, text: str, subtitle: str = "", tags: str = ""):
+    def create_news(self, title: str, text: str, subtitle: str = "", tags: str = "", image_path: str = ""):
         self.title_input.fill(title)
         self.text_input.fill(text)
         if subtitle:
             self.subtitle_input.fill(subtitle)
         if tags:
             self.tags_input.fill(tags)
+        if image_path:
+            self.image_input.set_input_files(image_path)
         self.create_button.click()
+
+    def open(self):
+            self.page.goto(BASE_URL + "/news/create")
+
+    def is_field_required(self, locator) -> bool:
+        return locator.evaluate("el => !el.checkValidity()")
+    
