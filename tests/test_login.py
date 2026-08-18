@@ -3,7 +3,7 @@ from playwright.sync_api import Page, expect
 from pages.login_page import LoginPage
 from pages.register_page import RegisterPage
 from config import BASE_URL
-from models.user import User
+from models.user import User, UserLoginAPIResponse
 
 @pytest.mark.smoke
 def test_valid_login(page: Page):
@@ -16,7 +16,7 @@ def test_valid_login(page: Page):
     assert page.evaluate("localStorage.getItem('token')")
 
 @pytest.mark.api
-def test_valid_answer_api(page: Page):
+def test_valid_answer_me_api(page: Page):
     login_page = LoginPage(page)
     login_page.open()
 
@@ -28,6 +28,13 @@ def test_valid_answer_api(page: Page):
 
     request = page.request.get(f"https://archiscope.ru/api/users/me", headers={'Authorization': f'Bearer {token}'}).json()
     assert User(**request)
+
+@pytest.mark.api
+def test_valid_answer_login_api(page: Page):
+    request = page.request.post(url="https://archiscope.ru/api/auth/login", multipart={"username": "test@example.com", "password": "password123"})
+    assert request.status == 200
+    request = request.json()
+    assert UserLoginAPIResponse(**request)
 
 @pytest.mark.regression
 def test_invalid_login(page: Page):

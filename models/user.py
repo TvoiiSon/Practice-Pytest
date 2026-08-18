@@ -9,3 +9,7 @@ class User(BaseModel):
     phone: str
     photo_path: str | None = None
     created_at: datetime
+
+class UserLoginAPIResponse(BaseModel):
+    access_token: str
+    token_type: str
