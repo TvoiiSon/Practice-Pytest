@@ -129,3 +129,10 @@ def test_correct_clear_search_article(page: Page):
     news_feed_page.clear_search()
 
     expect(news_feed_page.list_articles).to_have_count(10)
+
+@pytest.mark.api
+def test_no_pii_leak_api_article(page: Page):
+    request = page.request.get("https://archiscope.ru/api/news/?page=1&per_page=1").json()
+
+    for item in request["items"]:
+        assert "email" not in item["author"] and "phone" not in item["author"]
