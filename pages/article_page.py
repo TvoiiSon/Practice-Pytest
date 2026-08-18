@@ -11,3 +11,6 @@ class ArticlePage(BasePage):
     def add_comment(self, text: str):
         self.comment_input.fill(text)
         self.submit_comment_button.click()
+
+    def is_field_required(self, locator) -> bool:
+        return locator.evaluate("el => !el.checkValidity()")

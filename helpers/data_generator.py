@@ -10,3 +10,6 @@ def generate_user() -> dict:
         "password": fake.password(length=12),
         "phone": fake.phone_number(),
     }
+
+def generate_comment() -> str:
+    return fake.unique.sentence()
