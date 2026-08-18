@@ -1,6 +1,7 @@
 import pytest
 from playwright.sync_api import Page, expect
 from pages.login_page import LoginPage
+from pages.register_page import RegisterPage
 
 @pytest.mark.smoke
 def test_valid_login(page: Page):
@@ -28,3 +29,11 @@ def test_empty_fields_login(page: Page, empty_field):
 
     validate_locator = getattr(login_page, f"{empty_field}_input")
     assert login_page.is_field_required(validate_locator)
+
+@pytest.mark.regression
+def test_go_to_register(page: Page):
+    login_page = LoginPage(page)
+    login_page.open()
+
+    login_page.go_to_register()
+    expect(page).to_have_url(RegisterPage.URL)
