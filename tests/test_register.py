@@ -4,8 +4,6 @@ from playwright.sync_api import Page, expect
 from pages.register_page import RegisterPage
 from helpers.data_generator import generate_user
 
-
-
 @pytest.mark.smoke
 def test_valid_register(page: Page):
     register_page = RegisterPage(page)
@@ -16,6 +14,7 @@ def test_valid_register(page: Page):
     expect(page).to_have_url(BASE_URL + "/login")
 
 @pytest.mark.parametrize("empty_field", ["first_name", "last_name", "email", "password"])
+@pytest.mark.regression
 def test_empty_fields_register(page: Page, empty_field):
     register_page = RegisterPage(page)
     register_page.open()
@@ -27,6 +26,7 @@ def test_empty_fields_register(page: Page, empty_field):
     assert register_page.is_field_required(validate_locator)
 
 @pytest.mark.parametrize("invalid_email", ["qwe@qwe", "qwe@qwecom"])
+@pytest.mark.regression
 def test_invalid_fields_register(page: Page, invalid_email):
     collected = []
 
@@ -44,3 +44,13 @@ def test_invalid_fields_register(page: Page, invalid_email):
     page.wait_for_load_state("networkidle")
 
     assert collected == []
+
+@pytest.mark.regression
+def test_empty_phone_register(page: Page):
+    register_page = RegisterPage(page)
+    register_page.open()
+
+    user = generate_user()
+    user["phone"] = ""
+    register_page.register(**user)
+    expect(page).to_have_url(BASE_URL + "/login")

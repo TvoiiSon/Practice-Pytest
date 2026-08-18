@@ -10,7 +10,7 @@ def test_valid_login(page: Page):
     login_page.login("test@example.com", "password123")
     expect(login_page.header.avatar_button).to_be_visible()
 
-@pytest.mark.smoke
+@pytest.mark.regression
 def test_invalid_login(page: Page):
     login_page = LoginPage(page)
     login_page.open()
@@ -18,6 +18,7 @@ def test_invalid_login(page: Page):
     expect(page.get_by_text("Incorrect email or password")).to_be_visible()
 
 @pytest.mark.parametrize("empty_field", ["email", "password"])
+@pytest.mark.regression
 def test_empty_fields_login(page: Page, empty_field):
     login_page = LoginPage(page)
     login_page.open()
