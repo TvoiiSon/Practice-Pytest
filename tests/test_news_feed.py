@@ -73,3 +73,21 @@ def test_correct_change_content(page: Page):
     news_feed_page.go_to_page("2")
 
     expect(news_feed_page.list_articles.first).not_to_have_text(title_article_first)
+
+@pytest.mark.regression
+def test_correct_change_content_api(page: Page):
+    news_feed_page = NewsFeedPage(page)
+    news_feed_page.open()
+    expect(news_feed_page.list_articles).to_have_count(10)
+    
+    title_article_first = news_feed_page.list_articles.first.text_content()
+    request = page.request.get("https://archiscope.ru/api/news/?page=1&per_page=10").json()
+    assert request["items"][0]["title"] == title_article_first
+
+    page.wait_for_timeout(1000)
+    news_feed_page.go_to_page("2")
+    page.wait_for_timeout(1000)
+
+    title_article_second = news_feed_page.list_articles.first.text_content()
+    request_s = page.request.get("https://archiscope.ru/api/news/?page=2&per_page=10").json()
+    assert request_s["items"][0]["title"] == title_article_second
