@@ -59,3 +59,17 @@ def test_incorrect_per_page_api_article(page: Page, params_per_page):
     request = page.request.get(f"https://archiscope.ru/api/news/?page=1&per_page={params_per_page}")
 
     assert request.status == 422
+
+@pytest.mark.regression
+def test_correct_change_content(page: Page):
+    news_feed_page = NewsFeedPage(page)
+    news_feed_page.open()
+    expect(news_feed_page.list_articles).to_have_count(10)
+
+    title_article_first = news_feed_page.list_articles.first.text_content()
+
+    page.wait_for_timeout(1000)
+
+    news_feed_page.go_to_page("2")
+
+    expect(news_feed_page.list_articles.first).not_to_have_text(title_article_first)
