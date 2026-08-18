@@ -15,6 +15,7 @@ class NewsFeedPage(BasePage):
         self.add_news_link = page.get_by_role("link", name="+ Добавить новость")
         self.search_input = page.get_by_role("textbox", name="Поиск")
         self.clear_search_button = page.get_by_role("button", name="Очистить поиск")
+        self.notfound_text = page.get_by_text("Ничего не найдено")
         self.next_page_button = page.get_by_role("button", name="»")
         self.prev_page_button = page.get_by_role("button", name="«")
 

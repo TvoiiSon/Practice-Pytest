@@ -91,3 +91,41 @@ def test_correct_change_content_api(page: Page):
     title_article_second = news_feed_page.list_articles.first.text_content()
     request_s = page.request.get("https://archiscope.ru/api/news/?page=2&per_page=10").json()
     assert request_s["items"][0]["title"] == title_article_second
+
+@pytest.mark.regression
+def test_correct_search_article(page: Page):
+    news_feed_page = NewsFeedPage(page)
+    news_feed_page.open()
+    expect(news_feed_page.list_articles).to_have_count(10)
+        
+    title_before_search = news_feed_page.list_articles.first.text_content()
+    _ = news_feed_page.search(title_before_search)
+    page.wait_for_timeout(1000)
+    title_after_search = news_feed_page.list_articles.first.text_content()
+
+    assert title_before_search == title_after_search
+
+@pytest.mark.regression
+def test_incorrect_search_article(page: Page):
+    news_feed_page = NewsFeedPage(page)
+    news_feed_page.open()
+    expect(news_feed_page.list_articles).to_have_count(10)
+    
+    _ = news_feed_page.search("asdkfjhqwerty12345")
+    page.wait_for_timeout(1000)
+
+    expect(news_feed_page.notfound_text).to_be_visible()
+
+@pytest.mark.regression
+def test_correct_clear_search_article(page: Page):
+    news_feed_page = NewsFeedPage(page)
+    news_feed_page.open()
+    expect(news_feed_page.list_articles).to_have_count(10)
+        
+    title_before_search = news_feed_page.list_articles.first.text_content()
+    _ = news_feed_page.search(title_before_search)
+    page.wait_for_timeout(1000)
+
+    news_feed_page.clear_search()
+
+    expect(news_feed_page.list_articles).to_have_count(10)
