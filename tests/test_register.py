@@ -54,3 +54,13 @@ def test_empty_phone_register(page: Page):
     user["phone"] = ""
     register_page.register(**user)
     expect(page).to_have_url(BASE_URL + "/login")
+
+@pytest.mark.regression
+def test_exists_email_register(page: Page):
+    register_page = RegisterPage(page)
+    register_page.open()
+
+    user = generate_user()
+    user["email"] = "test@example.com"
+    register_page.register(**user)
+    expect(page.get_by_text("Email already registered")).to_be_visible()
