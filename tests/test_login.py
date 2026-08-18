@@ -9,6 +9,7 @@ def test_valid_login(page: Page):
     login_page.open()
     login_page.login("test@example.com", "password123")
     expect(login_page.header.avatar_button).to_be_visible()
+    assert page.evaluate("localStorage.getItem('token')")
 
 @pytest.mark.regression
 def test_invalid_login(page: Page):
