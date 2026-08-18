@@ -33,6 +33,17 @@ def test_empty_fields_login(page: Page, empty_field):
     assert login_page.is_field_required(validate_locator)
 
 @pytest.mark.regression
+def test_logout(page: Page):
+    login_page = LoginPage(page)
+    login_page.open()
+    login_page.login("test@example.com", "password123")
+    expect(login_page.header.avatar_button).to_be_visible()
+    assert page.evaluate("localStorage.getItem('token')")
+
+    login_page.header.logout()
+    assert page.evaluate("localStorage.getItem('token')") is None
+
+@pytest.mark.regression
 def test_go_to_register(page: Page):
     login_page = LoginPage(page)
     login_page.open()
