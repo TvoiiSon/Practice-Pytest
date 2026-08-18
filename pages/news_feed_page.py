@@ -11,6 +11,7 @@ class NewsFeedPage(BasePage):
         self.logo_link = page.get_by_role("link", name="📰 NewsPlatform")
         self.login_link = page.get_by_role("link", name="Войти")
         self.register_link = page.get_by_role("link", name="Регистрация")
+        self.list_articles = page.get_by_role("heading", level=2)
         self.add_news_link = page.get_by_role("link", name="+ Добавить новость")
         self.search_input = page.get_by_role("textbox", name="Поиск")
         self.clear_search_button = page.get_by_role("button", name="Очистить поиск")
