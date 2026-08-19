@@ -23,6 +23,7 @@ class NewsFeedPage(BasePage):
 
     def open(self):
         self.page.goto(self.URL)
+        self.page.wait_for_load_state("networkidle")
 
     @allure.step("Поиск новости с Названием: {query}")
     def search(self, query: str):
