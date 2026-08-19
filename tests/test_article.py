@@ -4,6 +4,7 @@ from playwright.sync_api import Page, expect
 from pages.article_page import ArticlePage
 from models.article import Comment
 from helpers.data_generator import generate_comment
+from loguru import logger
 
 @allure.tag("Позитивный")
 @pytest.mark.smoke
@@ -22,6 +23,7 @@ def test_incorrect_create_comment(go_to_article_page: ArticlePage):
 @allure.tag("Негативный")
 @pytest.mark.api
 def test_pii_article_id_returns(page: Page):
+    logger.info("Запрос комментариев статьи id=39 — проверка отсутствия email/phone автора в ответе")
     request = page.request.get("https://archiscope.ru/api/news/39/comments").json()
 
     for item in request:
@@ -30,6 +32,7 @@ def test_pii_article_id_returns(page: Page):
 @allure.tag("Позитивный")
 @pytest.mark.api
 def test_valid_article_id_returns(page: Page):
+    logger.info("Запрос комментариев статьи id=39 — проверка схемы через Pydantic-модель Comment")
     request = page.request.get("https://archiscope.ru/api/news/39/comments").json()
     for item in request:
         assert Comment(**item)
@@ -38,5 +41,6 @@ def test_valid_article_id_returns(page: Page):
 @pytest.mark.parametrize("article_id", [-1, 0, 9999])
 @pytest.mark.api
 def test_invalid_article_id_returns_404(page: Page, article_id):
+    logger.info(f"Запрос комментариев несуществующей статьи id={article_id} — ожидаем 404")
     request = page.request.get(f"https://archiscope.ru/api/news/{article_id}/comments")
     assert request.status == 404

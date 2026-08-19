@@ -1,6 +1,7 @@
 from playwright.sync_api import Page
 from pages.base_page import BasePage
 from config import BASE_URL
+from loguru import logger
 
 class LoginPage(BasePage):
     URL = BASE_URL + "/login"
@@ -18,13 +19,16 @@ class LoginPage(BasePage):
     def login(self, email: str, password: str):
         self.email_input.fill(email)
         self.password_input.fill(password)
+        logger.info(f"Прохождение авторизации с email: {email}")
         self.login_button.click()
 
     def get_error_message(self) -> str:
         return self.page.get_by_text("Incorrect email or password").text_content()
 
     def is_field_required(self, locator) -> bool:
+        logger.info("Проверка поля на обязательное")
         return locator.evaluate("el => !el.checkValidity()")
 
     def go_to_register(self):
+        logger.info("Переход на страницу Регистрации по ссылке внизу формы Авторизации")
         self.register_link.click()

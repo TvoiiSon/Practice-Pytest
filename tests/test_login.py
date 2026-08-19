@@ -5,6 +5,7 @@ from pages.login_page import LoginPage
 from pages.register_page import RegisterPage
 from pages.header_component import HeaderComponent
 from models.user import User, UserLoginAPIResponse
+from loguru import logger
 
 @allure.tag("Позитивный")
 @pytest.mark.smoke
@@ -22,12 +23,14 @@ def test_valid_login(page: Page):
 def test_valid_answer_me_api(authenticated_page: Page):
     token = authenticated_page.evaluate("localStorage.getItem('token')")
 
+    logger.info("Запрос /api/users/me с Bearer-токеном — проверка схемы через Pydantic-модель User")
     request = authenticated_page.request.get("https://archiscope.ru/api/users/me", headers={'Authorization': f'Bearer {token}'}).json()
     assert User(**request)
 
 @allure.tag("Позитивный")
 @pytest.mark.api
 def test_valid_answer_login_api(page: Page):
+    logger.info("Запрос POST /api/auth/login напрямую, username: test@example.com — проверка статуса и схемы ответа")
     request = page.request.post(url="https://archiscope.ru/api/auth/login", multipart={"username": "test@example.com", "password": "password123"})
     assert request.status == 200
     request = request.json()

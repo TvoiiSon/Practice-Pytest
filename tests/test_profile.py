@@ -5,6 +5,7 @@ from pages.header_component import HeaderComponent
 from pages.profile_page import ProfilePage
 from helpers.data_generator import generate_user
 from config import BASE_URL
+from loguru import logger
 
 @allure.tag("Позитивный")
 @pytest.mark.smoke
@@ -20,8 +21,10 @@ def test_update_profile_with_set_photo(go_to_profile_page: ProfilePage):
     go_to_profile_page.update_profile(**for_profile, image_path="test_data/images.jpeg")
 
     token = go_to_profile_page.page.evaluate("localStorage.getItem('token')")
+    logger.info("Запрос /api/users/me с Bearer-токеном — получение photo_path текущего пользователя")
     request = go_to_profile_page.page.request.get("https://archiscope.ru/api/users/me", headers={'Authorization': f'Bearer {token}'}).json()
 
+    logger.info(f"Проверка доступности загруженного фото профиля: {BASE_URL + request['photo_path']}")
     second_request = go_to_profile_page.page.request.get(BASE_URL + request["photo_path"])
     assert second_request.status == 200
 

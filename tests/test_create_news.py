@@ -4,6 +4,7 @@ from playwright.sync_api import Page, expect
 from pages.create_news_page import CreateNewsPage
 from helpers.data_generator import generate_article
 from config import BASE_URL
+from loguru import logger
 
 @allure.tag("Позитивный")
 @pytest.mark.smoke
@@ -23,12 +24,14 @@ def test_create_article_with_image(go_to_create_news_page: CreateNewsPage):
     article = generate_article()
     go_to_create_news_page.create_news(**article, image_path="test_data/images.jpeg")
 
+    logger.info(f"Поиск image_path для новости с Названием: {article['title']} через /api/news")
     request = go_to_create_news_page.page.request.get("https://archiscope.ru/api/news").json()
     image_path = ""
     for item in request["items"]:
         if item["title"] == article["title"]:
             image_path = item["image_path"]
 
+    logger.info(f"Проверка доступности загруженной картинки: {BASE_URL + image_path}")
     second_request = go_to_create_news_page.page.request.get(BASE_URL + image_path)
     assert second_request.status == 200
 

@@ -1,5 +1,6 @@
 import re
 from playwright.sync_api import Page
+from loguru import logger
 
 class HeaderComponent:
     def __init__(self, page: Page):
@@ -13,9 +14,11 @@ class HeaderComponent:
         self.logout_button = page.get_by_role("button", name="Выйти")
 
     def open_profile(self):
+        logger.info("Переход на страницу Профиля через нажатие по аватару, затем кнопке Профиль")
         self.avatar_button.click()
         self.profile_link.click()
 
     def logout(self):
+        logger.info("Выход из аккаунта пользователя через нажатие по аватару, затем кнопке Выйти")
         self.avatar_button.click()
         self.logout_button.click()

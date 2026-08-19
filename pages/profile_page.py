@@ -1,6 +1,7 @@
 from playwright.sync_api import Page
 from pages.base_page import BasePage
 from config import BASE_URL
+from loguru import logger
 
 class ProfilePage(BasePage):
     URL = BASE_URL + "/profile"
@@ -28,9 +29,10 @@ class ProfilePage(BasePage):
             self.password_input.fill(password)
         if image_path:
             self.image_input.set_input_files(image_path)
-
+        logger.info(f"Обновления профиля с новым Именем: {first_name}, Фамилией: {last_name}, Email: {email}")
         self.save_button.click()
 
     def is_field_required(self, locator) -> bool:
+        logger.info("Проверка поля на обязательное")
         return locator.evaluate("el => !el.checkValidity()")
     
