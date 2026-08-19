@@ -22,7 +22,7 @@ def test_correct_create_article(go_to_create_news_page: CreateNewsPage):
     response = response_info.value
 
     assert response.status == 200, f"Ожидали получить статус 200, а получили {response.status}"
-    expect(go_to_create_news_page.page.get_by_text(article["title"])).to_be_visible(message="Ожидали создание новости, но случилась ошибка")
+    expect(go_to_create_news_page.page.get_by_text(article["title"]), message="Ожидали создание новости, но случилась ошибка").to_be_visible()
 
 @allure.epic("NewsPlatform")
 @allure.feature("Создание новости")
@@ -84,4 +84,4 @@ def test_empty_notrequired_field(go_to_create_news_page: CreateNewsPage, empty_f
     response = response_info.value
 
     assert response.status == 200, f"Ожидали получить статус 200, а получили {response.status}"
-    expect(go_to_create_news_page.page.get_by_text(article["title"])).to_be_visible(message="Ожидали создание новости с необязательными пустыми полями, но случилась ошибка")
+    expect(go_to_create_news_page.page.get_by_text(article["title"]), message="Ожидали создание новости с необязательными пустыми полями, но случилась ошибка").to_be_visible()

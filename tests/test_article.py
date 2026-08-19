@@ -18,7 +18,7 @@ def test_correct_create_comment(go_to_article_page: ArticlePage):
     comment = generate_comment()
     go_to_article_page.add_comment(comment)
 
-    expect(go_to_article_page.page.locator("p").get_by_text(comment)).to_be_visible(message="Ожидали добавление комментария к новости, но комментарий не добавился")
+    expect(go_to_article_page.page.locator("p").get_by_text(comment), message="Ожидали добавление комментария к новости, но комментарий не добавился").to_be_visible()
 
 @allure.epic("NewsPlatform")
 @allure.feature("Детальная страница новости")

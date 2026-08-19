@@ -41,6 +41,9 @@ def test_update_profile_with_set_photo(go_to_profile_page: ProfilePage):
         second_request = go_to_profile_page.page.request.get(BASE_URL + request["photo_path"])
         assert second_request.status == 200, f"Ожидали статус 200 при запросе загруженного фото профиля, получили {second_request.status}"
 
+        avatar_img = go_to_profile_page.page.get_by_alt_text("Avatar")
+        assert avatar_img.evaluate("el => el.complete && el.naturalWidth === 0"), "Аватар в шапке загрузился, хотя ожидали 404 по фото профиля"
+
 @allure.epic("NewsPlatform")
 @allure.feature("Профиль пользователя")
 @allure.story("Пустое обязательное поле профиля")
