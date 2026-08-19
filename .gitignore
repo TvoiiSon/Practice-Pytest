@@ -11,3 +11,5 @@ traces/
 test_run.log
 
 .env
+
+test-results/

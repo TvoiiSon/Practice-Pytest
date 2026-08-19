@@ -1,4 +1,5 @@
 import pytest
+import allure
 from playwright.sync_api import Page, expect
 from pages.login_page import LoginPage
 from pages.register_page import RegisterPage
@@ -81,3 +82,21 @@ def go_to_profile_page(register_page: Page):
     profile_page = ProfilePage(register_page)
     
     return profile_page
+
+@pytest.hookimpl(tryfirst=True, hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    outcome = yield
+    rep = outcome.get_result()
+    setattr(item, f"rep_{rep.when}", rep)
+
+@pytest.fixture(autouse=True)
+def attach_on_failure(request, page: Page):
+    page.context.tracing.start(screenshots=True, snapshots=True, sources=True)
+    yield
+    if request.node.rep_call.failed:
+        page.context.tracing.stop(path="test-results/trace.zip")
+        allure.attach.file("test-results/trace.zip", name="trace", attachment_type=allure.attachment_type.ZIP)
+        page.screenshot(path="test-results/screenshot.png")
+        allure.attach.file("test-results/screenshot.png", name="screenshot", attachment_type=allure.attachment_type.PNG)
+    else:
+        page.context.tracing.stop()
