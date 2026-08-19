@@ -6,6 +6,10 @@ from pages.register_page import RegisterPage
 from pages.login_page import LoginPage
 from helpers.data_generator import generate_user
 
+@allure.epic("NewsPlatform")
+@allure.feature("Аутентификация")
+@allure.story("Полный цикл: регистрация → редирект → логин")
+@allure.description("Проверяет полный цикл от регистрации нового пользователя до успешной авторизации под ним")
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Позитивный")
 @pytest.mark.regression

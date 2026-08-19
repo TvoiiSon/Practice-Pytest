@@ -6,6 +6,10 @@ from pages.article_page import ArticlePage
 from models.article import Article
 from loguru import logger
 
+@allure.epic("NewsPlatform")
+@allure.feature("Лента новостей")
+@allure.story("Количество новостей на странице")
+@allure.description("Проверяет, что на странице ленты отображается 10 новостей")
 @allure.severity(allure.severity_level.NORMAL)
 @allure.tag("Позитивный")
 @pytest.mark.smoke
@@ -16,6 +20,10 @@ def test_correct_count_news(page: Page):
 
     expect(news_feed_page.list_articles, message="Ожидали 10 новостей на странице ленты").to_have_count(10)
 
+@allure.epic("NewsPlatform")
+@allure.feature("Лента новостей")
+@allure.story("Сортировка новостей по дате создания")
+@allure.description("Проверяет, что новости в ленте отсортированы по убыванию даты создания через API")
 @allure.severity(allure.severity_level.NORMAL)
 @allure.tag("Позитивный")
 @pytest.mark.smoke
@@ -30,6 +38,10 @@ def test_correct_sorted_news(page: Page):
 
         assert items == sorted(items, reverse=True), "Новости в ленте отсортированы не по убыванию даты создания"
 
+@allure.epic("NewsPlatform")
+@allure.feature("Лента новостей")
+@allure.story("Переход на страницу новости из ленты")
+@allure.description("Проверяет, что клик по названию новости в ленте открывает страницу этой новости")
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Позитивный")
 @pytest.mark.smoke
@@ -45,6 +57,10 @@ def test_correct_redirect_article(page: Page):
 
     expect(article_page.heading, message="Заголовок статьи не отобразился после перехода по ссылке из ленты").to_be_visible()
 
+@allure.epic("NewsPlatform")
+@allure.feature("Лента новостей")
+@allure.story("Валидная схема новости из API")
+@allure.description("Проверяет, что новость из API соответствует схеме модели Article")
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Позитивный")
 @pytest.mark.api
@@ -55,6 +71,10 @@ def test_correct_answer_api_article(page: Page):
 
         assert Article(**request["items"][0])
 
+@allure.epic("NewsPlatform")
+@allure.feature("Пагинация")
+@allure.story("Невалидный номер страницы")
+@allure.description("Проверяет, что запрос списка новостей с невалидным номером страницы возвращает статус 422")
 @allure.severity(allure.severity_level.MINOR)
 @allure.tag("Негативный")
 @pytest.mark.parametrize("params_page", [-1, 0])
@@ -66,6 +86,10 @@ def test_incorrect_page_api_article(page: Page, params_page):
 
         assert request.status == 422, f"Ожидали статус 422 для невалидного page={params_page}, получили {request.status}"
 
+@allure.epic("NewsPlatform")
+@allure.feature("Пагинация")
+@allure.story("Страница за пределами диапазона")
+@allure.description("Проверяет, что запрос страницы за пределами доступного диапазона возвращает статус 200 и пустой список")
 @allure.severity(allure.severity_level.MINOR)
 @allure.tag("Негативный")
 @pytest.mark.parametrize("params_page", [9999])
@@ -77,6 +101,10 @@ def test_incorrect_page_api_article_empty(page: Page, params_page):
         answer = request.json()
         assert answer["items"] == [] and request.status == 200, f"Ожидали пустой items и статус 200 для page={params_page} за пределами диапазона, получили status={request.status}, items={answer['items']}"
 
+@allure.epic("NewsPlatform")
+@allure.feature("Пагинация")
+@allure.story("Невалидный per_page")
+@allure.description("Проверяет, что запрос списка новостей с невалидным значением per_page возвращает статус 422")
 @allure.severity(allure.severity_level.MINOR)
 @allure.tag("Негативный")
 @pytest.mark.parametrize("params_per_page", [-1, 0, 9999])
@@ -88,6 +116,10 @@ def test_incorrect_per_page_api_article(page: Page, params_per_page):
 
         assert request.status == 422, f"Ожидали статус 422 для невалидного per_page={params_per_page}, получили {request.status}"
 
+@allure.epic("NewsPlatform")
+@allure.feature("Пагинация")
+@allure.story("Переход на вторую страницу")
+@allure.description("Проверяет, что переход на страницу 2 меняет отображаемый список новостей")
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Позитивный")
 @pytest.mark.smoke
@@ -108,6 +140,10 @@ def test_correct_change_content(page: Page):
         news_feed_page.go_to_page("2")
         expect(news_feed_page.list_articles.first, message="Контент не сменился после повторного перехода на страницу 2").not_to_have_text(title_article_first)
 
+@allure.epic("NewsPlatform")
+@allure.feature("Пагинация")
+@allure.story("Возврат на первую страницу")
+@allure.description("Проверяет, что после перехода на страницу 2 и обратно на страницу 1 отображается исходный список новостей")
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Позитивный")
 @pytest.mark.smoke
@@ -136,6 +172,10 @@ def test_correct_return_to_first_page(page: Page):
             news_feed_page.go_to_page("1")
             expect(news_feed_page.list_articles.first, message="После повторного возврата на страницу 1 контент не совпал с исходным").to_have_text(title_article_first)
 
+@allure.epic("NewsPlatform")
+@allure.feature("Пагинация")
+@allure.story("Сверка содержимого страниц с API")
+@allure.description("Проверяет, что содержимое ленты на страницах 1 и 2 совпадает с данными из API")
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Позитивный")
 @pytest.mark.smoke
@@ -167,6 +207,10 @@ def test_correct_change_content_api(page: Page):
         request_s = page.request.get("https://archiscope.ru/api/news/?page=2&per_page=10").json()
         assert request_s["items"][0]["title"] == title_article_second, f"Первая новость в API (page=2) не совпала с тем, что показано в UI: API={request_s['items'][0]['title']!r}, UI={title_article_second!r}"
 
+@allure.epic("NewsPlatform")
+@allure.feature("Поиск")
+@allure.story("Поиск по полному названию")
+@allure.description("Проверяет, что поиск по полному названию новости возвращает эту новость")
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Позитивный")
 @pytest.mark.smoke
@@ -182,6 +226,10 @@ def test_correct_search_article(page: Page):
 
     assert title_before_search == title_after_search, f"Поиск по полному названию вернул другую новость: искали {title_before_search!r}, получили {title_after_search!r}"
 
+@allure.epic("NewsPlatform")
+@allure.feature("Поиск")
+@allure.story("Поиск несуществующей новости")
+@allure.description("Проверяет, что поиск по несуществующему запросу показывает сообщение об отсутствии результатов")
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Негативный")
 @pytest.mark.smoke
@@ -195,6 +243,10 @@ def test_incorrect_search_article(page: Page):
 
     expect(news_feed_page.notfound_text, message="Сообщение 'Ничего не найдено' не появилось при поиске несуществующей новости").to_be_visible()
 
+@allure.epic("NewsPlatform")
+@allure.feature("Поиск")
+@allure.story("Очистка поиска")
+@allure.description("Проверяет, что очистка поля поиска возвращает полный список новостей")
 @allure.severity(allure.severity_level.NORMAL)
 @allure.tag("Позитивный")
 @pytest.mark.smoke
@@ -211,6 +263,10 @@ def test_correct_clear_search_article(page: Page):
 
     expect(news_feed_page.list_articles, message="После очистки поиска не вернулись все 10 новостей").to_have_count(10)
 
+@allure.epic("NewsPlatform")
+@allure.feature("Лента новостей")
+@allure.story("Отсутствие PII в списке новостей")
+@allure.description("Проверяет, что ответ API со списком новостей не содержит email и phone автора")
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Негативный")
 @pytest.mark.api

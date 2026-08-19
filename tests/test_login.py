@@ -7,6 +7,10 @@ from pages.header_component import HeaderComponent
 from models.user import User, UserLoginAPIResponse
 from loguru import logger
 
+@allure.epic("NewsPlatform")
+@allure.feature("Аутентификация")
+@allure.story("Успешный вход по логину и паролю")
+@allure.description("Проверяет, что валидный пользователь может авторизоваться и получить токен в localStorage")
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Позитивный")
 @pytest.mark.smoke
@@ -20,6 +24,10 @@ def test_valid_login(page: Page):
     expect(login_page.header.avatar_button, message="Аватар не появился в шапке — авторизация не прошла успешно").to_be_visible()
     assert page.evaluate("localStorage.getItem('token')"), "Токен не сохранился в localStorage после успешной авторизации"
 
+@allure.epic("NewsPlatform")
+@allure.feature("Аутентификация")
+@allure.story("Валидные данные пользователя из API через GET запрос")
+@allure.description("Проверяет, что ответ /api/users/me соответствует схеме модели User")
 @allure.severity(allure.severity_level.NORMAL)
 @allure.tag("Позитивный")
 @pytest.mark.api
@@ -31,6 +39,10 @@ def test_valid_answer_me_api(authenticated_page: Page):
         request = authenticated_page.request.get("https://archiscope.ru/api/users/me", headers={'Authorization': f'Bearer {token}'}).json()
         assert User(**request)
 
+@allure.epic("NewsPlatform")
+@allure.feature("Аутентификация")
+@allure.story("Корректность статуса и схемы ответа, через прямой POST запрос с параметрами пользователя")
+@allure.description("Проверяет, что валидный ответ статуса и схемы ответа из API при помощи прямого POST запроса")
 @allure.severity(allure.severity_level.NORMAL)
 @allure.tag("Позитивный")
 @pytest.mark.api
@@ -42,6 +54,10 @@ def test_valid_answer_login_api(page: Page):
         request = request.json()
         assert UserLoginAPIResponse(**request)
 
+@allure.epic("NewsPlatform")
+@allure.feature("Аутентификация")
+@allure.story("Некорректный логин")
+@allure.description("Проверяет, что сервер обрабатывает некорректный логин при отправке формы")
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Негативный")
 @pytest.mark.regression
@@ -52,6 +68,10 @@ def test_invalid_login(page: Page):
     login_page.login("wrong@example.com", "wpassword")
     expect(page.get_by_text("Incorrect email or password"), message="Сообщение об ошибке неверных учётных данных не появилось").to_be_visible()
 
+@allure.epic("NewsPlatform")
+@allure.feature("Аутентификация")
+@allure.story("Пустое поле логина")
+@allure.description("Проверяет, что поле логина в форме авторизации настроено как обязательное")
 @allure.severity(allure.severity_level.NORMAL)
 @allure.tag("Негативный")
 @pytest.mark.parametrize("empty_field", ["email", "password"])
@@ -69,6 +89,10 @@ def test_empty_fields_login(page: Page, empty_field):
     validate_locator = getattr(login_page, f"{empty_field}_input")
     assert login_page.is_field_required(validate_locator), f"Поле {empty_field} является обязательным для заполнения"
 
+@allure.epic("NewsPlatform")
+@allure.feature("Аутентификация")
+@allure.story("Выход из аккаунта")
+@allure.description("Проверка корректности действий при выходе из аккаунта")
 @allure.severity(allure.severity_level.NORMAL)
 @allure.tag("Позитивный")
 @pytest.mark.regression
@@ -78,6 +102,10 @@ def test_logout(authenticated_page: Page):
     header_component.logout()
     assert authenticated_page.evaluate("localStorage.getItem('token')") is None, "Токен остался в localStorage после выхода из аккаунта"
 
+@allure.epic("NewsPlatform")
+@allure.feature("Аутентификация")
+@allure.story("Переход на страницу регистрации из формы авторизации")
+@allure.description("Проверка корректности ссылки на регистрацию под формой авторизации")
 @allure.severity(allure.severity_level.NORMAL)
 @allure.tag("Позитивный")
 @pytest.mark.regression
