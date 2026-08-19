@@ -71,3 +71,28 @@ def test_empty_required_field(page: Page, empty_field):
 
     validate_locator = getattr(create_new_article_page, f"{empty_field}_input")
     assert create_new_article_page.is_field_required(validate_locator)
+
+@pytest.mark.parametrize("empty_field", ["subtitle", "tags"])
+@pytest.mark.regression
+def test_empty_notrequired_field(page: Page, empty_field):
+    login_page = LoginPage(page)
+    login_page.open()
+
+    login_page.login("test@example.com", "password123")
+
+    expect(login_page.header.avatar_button).to_be_visible()
+    assert page.evaluate("localStorage.getItem('token')")
+
+    create_new_article_page = CreateNewsPage(page)
+    create_new_article_page.open()
+
+    article = generate_article()
+    article[empty_field] = ""
+
+    with page.expect_response("**/api/news/*") as response_info:
+        create_new_article_page.create_news(**article)
+    response = response_info.value
+
+    assert response.status == 200
+    expect(page.get_by_text(article["title"])).to_be_visible()
+    
