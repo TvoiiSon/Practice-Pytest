@@ -1,10 +1,12 @@
 import pytest
+import allure
 from config import BASE_URL
 from playwright.sync_api import Page, expect
 from pages.register_page import RegisterPage
 from pages.login_page import LoginPage
 from helpers.data_generator import generate_user
 
+@allure.tag("Позитивный")
 @pytest.mark.regression
 def test_flow_register_login(page: Page):
     login_page = LoginPage(page)

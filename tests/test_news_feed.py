@@ -1,17 +1,20 @@
 import pytest
+import allure
 from playwright.sync_api import Page, expect
 from pages.news_feed_page import NewsFeedPage
 from pages.article_page import ArticlePage
 from models.article import Article
 
-@pytest.mark.regression
+@allure.tag("Позитивный")
+@pytest.mark.smoke
 def test_correct_count_news(page: Page):
     news_feed_page = NewsFeedPage(page)
     news_feed_page.open()
 
     expect(news_feed_page.list_articles).to_have_count(10)
 
-@pytest.mark.regression
+@allure.tag("Позитивный")
+@pytest.mark.smoke
 def test_correct_sorted_news(page: Page):
     request = page.request.get(f"https://archiscope.ru/api/news/?page=1&per_page=10").json()
     items = []
@@ -20,7 +23,8 @@ def test_correct_sorted_news(page: Page):
 
     assert items == sorted(items, reverse=True) 
 
-@pytest.mark.regression
+@allure.tag("Позитивный")
+@pytest.mark.smoke
 def test_correct_redirect_article(page: Page):
     news_feed_page = NewsFeedPage(page)
     news_feed_page.open()
@@ -32,12 +36,14 @@ def test_correct_redirect_article(page: Page):
 
     expect(article_page.heading).to_be_visible()
 
+@allure.tag("Позитивный")
 @pytest.mark.api
 def test_correct_answer_api_article(page: Page):
     request = page.request.get("https://archiscope.ru/api/news/?page=1&per_page=1").json()
     
     assert Article(**request["items"][0])
 
+@allure.tag("Негативный")
 @pytest.mark.parametrize("params_page", [-1, 0])
 @pytest.mark.api
 def test_incorrect_page_api_article(page: Page, params_page):
@@ -45,7 +51,7 @@ def test_incorrect_page_api_article(page: Page, params_page):
 
     assert request.status == 422
 
-
+@allure.tag("Негативный")
 @pytest.mark.parametrize("params_page", [9999])
 @pytest.mark.api
 def test_incorrect_page_api_article_empty(page: Page, params_page):
@@ -53,6 +59,7 @@ def test_incorrect_page_api_article_empty(page: Page, params_page):
     answer = request.json()
     assert answer["items"] == [] and request.status == 200
 
+@allure.tag("Негативный")
 @pytest.mark.parametrize("params_per_page", [-1, 0, 9999])
 @pytest.mark.api
 def test_incorrect_per_page_api_article(page: Page, params_per_page):
@@ -60,7 +67,8 @@ def test_incorrect_per_page_api_article(page: Page, params_per_page):
 
     assert request.status == 422
 
-@pytest.mark.regression
+@allure.tag("Позитивный")
+@pytest.mark.smoke
 def test_correct_change_content(page: Page):
     news_feed_page = NewsFeedPage(page)
     news_feed_page.open()
@@ -74,7 +82,8 @@ def test_correct_change_content(page: Page):
 
     expect(news_feed_page.list_articles.first).not_to_have_text(title_article_first)
 
-@pytest.mark.regression
+@allure.tag("Позитивный")
+@pytest.mark.smoke
 def test_correct_return_to_first_page(page: Page):
     news_feed_page = NewsFeedPage(page)
     news_feed_page.open()
@@ -92,7 +101,8 @@ def test_correct_return_to_first_page(page: Page):
 
     expect(news_feed_page.list_articles.first).to_have_text(title_article_first)
 
-@pytest.mark.regression
+@allure.tag("Позитивный")
+@pytest.mark.smoke
 def test_correct_change_content_api(page: Page):
     news_feed_page = NewsFeedPage(page)
     news_feed_page.open()
@@ -110,7 +120,8 @@ def test_correct_change_content_api(page: Page):
     request_s = page.request.get("https://archiscope.ru/api/news/?page=2&per_page=10").json()
     assert request_s["items"][0]["title"] == title_article_second
 
-@pytest.mark.regression
+@allure.tag("Позитивный")
+@pytest.mark.smoke
 def test_correct_search_article(page: Page):
     news_feed_page = NewsFeedPage(page)
     news_feed_page.open()
@@ -123,7 +134,8 @@ def test_correct_search_article(page: Page):
 
     assert title_before_search == title_after_search
 
-@pytest.mark.regression
+@allure.tag("Негативный")
+@pytest.mark.smoke
 def test_incorrect_search_article(page: Page):
     news_feed_page = NewsFeedPage(page)
     news_feed_page.open()
@@ -134,7 +146,8 @@ def test_incorrect_search_article(page: Page):
 
     expect(news_feed_page.notfound_text).to_be_visible()
 
-@pytest.mark.regression
+@allure.tag("Позитивный")
+@pytest.mark.smoke
 def test_correct_clear_search_article(page: Page):
     news_feed_page = NewsFeedPage(page)
     news_feed_page.open()
@@ -148,6 +161,7 @@ def test_correct_clear_search_article(page: Page):
 
     expect(news_feed_page.list_articles).to_have_count(10)
 
+@allure.tag("Негативный")
 @pytest.mark.api
 def test_no_pii_leak_api_article(page: Page):
     request = page.request.get("https://archiscope.ru/api/news/?page=1&per_page=1").json()
