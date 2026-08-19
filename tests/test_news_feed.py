@@ -135,7 +135,7 @@ def test_correct_change_content(page: Page):
 
     try:
         expect(news_feed_page.list_articles.first, message="Контент не сменился после перехода на страницу 2").not_to_have_text(title_article_first, timeout=1000)
-    except AssertionError as e:
+    except AssertionError:
         logger.warning("Известный баг: клик по пагинации перекрыт фоновым self-refetch, повтор клика")
         news_feed_page.go_to_page("2")
         expect(news_feed_page.list_articles.first, message="Контент не сменился после повторного перехода на страницу 2").not_to_have_text(title_article_first)
@@ -158,7 +158,7 @@ def test_correct_return_to_first_page(page: Page):
 
     try:
         expect(news_feed_page.list_articles.first, message="Контент не сменился после перехода на страницу 2").not_to_have_text(title_article_first)
-    except AssertionError as e:
+    except AssertionError:
             logger.warning("Известный баг: клик по пагинации перекрыт фоновым self-refetch, повтор клика")
             news_feed_page.go_to_page("2")
             expect(news_feed_page.list_articles.first, message="Контент не сменился после повторного перехода на страницу 2").not_to_have_text(title_article_first)
@@ -167,7 +167,7 @@ def test_correct_return_to_first_page(page: Page):
 
     try:
         expect(news_feed_page.list_articles.first, message="После возврата на страницу 1 контент не совпал с исходным").to_have_text(title_article_first)
-    except AssertionError as e:
+    except AssertionError:
             logger.warning("Известный баг: клик по пагинации перекрыт фоновым self-refetch, повтор клика")
             news_feed_page.go_to_page("1")
             expect(news_feed_page.list_articles.first, message="После повторного возврата на страницу 1 контент не совпал с исходным").to_have_text(title_article_first)
@@ -191,12 +191,11 @@ def test_correct_change_content_api(page: Page):
         request = page.request.get("https://archiscope.ru/api/news/?page=1&per_page=10").json()
         assert request["items"][0]["title"] == title_article_first, f"Первая новость в API (page=1) не совпала с тем, что показано в UI: API={request['items'][0]['title']!r}, UI={title_article_first!r}"
 
-
     news_feed_page.go_to_page("2")
 
     try:
         expect(news_feed_page.list_articles.first, message="Контент не сменился после перехода на страницу 2").not_to_have_text(title_article_first)
-    except AssertionError as e:
+    except AssertionError:
             logger.warning("Известный баг: клик по пагинации перекрыт фоновым self-refetch, повтор клика")
             news_feed_page.go_to_page("2")
             expect(news_feed_page.list_articles.first, message="Контент не сменился после повторного перехода на страницу 2").not_to_have_text(title_article_first)
@@ -221,7 +220,7 @@ def test_correct_search_article(page: Page):
     expect(news_feed_page.list_articles).to_have_count(10)
 
     title_before_search = news_feed_page.list_articles.first.text_content()
-    _ = news_feed_page.search(title_before_search)
+    news_feed_page.search(title_before_search)
     title_after_search = news_feed_page.list_articles.first.text_content()
 
     assert title_before_search == title_after_search, f"Поиск по полному названию вернул другую новость: искали {title_before_search!r}, получили {title_after_search!r}"
@@ -277,3 +276,39 @@ def test_no_pii_leak_api_article(page: Page):
 
         for item in request["items"]:
             assert "email" not in item["author"] and "phone" not in item["author"], "Утечка полей email и phone в списке новостей"
+
+@allure.epic("NewsPlatform")
+@allure.feature("Лента новостей")
+@allure.story("Пустая лента новостей (mock API)")
+@allure.description("Проверяет через мок API, что при пустом списке новостей UI показывает сообщение об отсутствии результатов, а не пустую страницу")
+@allure.severity(allure.severity_level.NORMAL)
+@allure.tag("Негативный")
+@pytest.mark.mock
+def test_empty_news_feed(page: Page):
+    def handler(route):
+        route.fulfill(status=200, content_type="application/json", body='{"items": [], "total": 0}')
+
+    page.route("**/api/news/**", handler)
+
+    news_feed_page = NewsFeedPage(page)
+    news_feed_page.open()
+
+    expect(news_feed_page.notfound_text, message="Сообщение 'Ничего не найдено' не появилось при пустом ответе API").to_be_visible()
+
+@allure.epic("NewsPlatform")
+@allure.feature("Лента новостей")
+@allure.story("Ошибка сервера при загрузке ленты (mock API)")
+@allure.description("Проверяет через мок API, что при ответе 500 от сервера UI не падает, а показывает сообщение об отсутствии результатов")
+@allure.severity(allure.severity_level.NORMAL)
+@allure.tag("Негативный")
+@pytest.mark.mock
+def test_news_feed_server_error(page: Page):
+    def handler(route):
+        route.fulfill(status=500, content_type="application/json", body='{"detail": "Internal Server Error"}')
+
+    page.route("**/api/news/**", handler)
+
+    news_feed_page = NewsFeedPage(page)
+    news_feed_page.open()
+
+    expect(news_feed_page.notfound_text, message="Сообщение 'Ничего не найдено' не появилось при ошибке 500 от сервера").to_be_visible()
