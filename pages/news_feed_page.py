@@ -1,5 +1,5 @@
 import allure
-from playwright.sync_api import Page
+from playwright.sync_api import Page, TimeoutError as PlaywrightTimeoutError
 from pages.base_page import BasePage
 from pages.create_news_page import CreateNewsPage
 from config import BASE_URL
@@ -22,8 +22,14 @@ class NewsFeedPage(BasePage):
         self.prev_page_button = page.get_by_role("button", name="«")
 
     def open(self):
-        self.page.goto(self.URL)
-        self.page.wait_for_load_state("networkidle")
+        with self.page.expect_response(lambda r: "/api/news/?page=1" in r.url):
+            self.page.goto(self.URL)
+        try:
+            with self.page.expect_response(lambda r: "/api/news/?page=1" in r.url, timeout=1000):
+                pass
+            logger.warning("Известный баг: пойман фоновый повторный запрос page=1 после загрузки ленты")
+        except PlaywrightTimeoutError:
+            pass
 
     @allure.step("Поиск новости с Названием: {query}")
     def search(self, query: str):
