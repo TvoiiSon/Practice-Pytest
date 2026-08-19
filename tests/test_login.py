@@ -2,7 +2,7 @@ import pytest
 from playwright.sync_api import Page, expect
 from pages.login_page import LoginPage
 from pages.register_page import RegisterPage
-from config import BASE_URL
+from pages.header_component import HeaderComponent
 from models.user import User, UserLoginAPIResponse
 
 @pytest.mark.smoke
@@ -16,17 +16,10 @@ def test_valid_login(page: Page):
     assert page.evaluate("localStorage.getItem('token')")
 
 @pytest.mark.api
-def test_valid_answer_me_api(page: Page):
-    login_page = LoginPage(page)
-    login_page.open()
+def test_valid_answer_me_api(authenticated_page: Page):
+    token = authenticated_page.evaluate("localStorage.getItem('token')")
 
-    login_page.login("test@example.com", "password123")
-
-    expect(login_page.header.avatar_button).to_be_visible()
-    token = page.evaluate("localStorage.getItem('token')")
-    assert token
-
-    request = page.request.get("https://archiscope.ru/api/users/me", headers={'Authorization': f'Bearer {token}'}).json()
+    request = authenticated_page.request.get("https://archiscope.ru/api/users/me", headers={'Authorization': f'Bearer {token}'}).json()
     assert User(**request)
 
 @pytest.mark.api
@@ -58,15 +51,10 @@ def test_empty_fields_login(page: Page, empty_field):
     assert login_page.is_field_required(validate_locator)
 
 @pytest.mark.regression
-def test_logout(page: Page):
-    login_page = LoginPage(page)
-    login_page.open()
-    login_page.login("test@example.com", "password123")
-    expect(login_page.header.avatar_button).to_be_visible()
-    assert page.evaluate("localStorage.getItem('token')")
-
-    login_page.header.logout()
-    assert page.evaluate("localStorage.getItem('token')") is None
+def test_logout(authenticated_page: Page):
+    header_component = HeaderComponent(authenticated_page)
+    header_component.logout()
+    assert authenticated_page.evaluate("localStorage.getItem('token')") is None
 
 @pytest.mark.regression
 def test_go_to_register(page: Page):
