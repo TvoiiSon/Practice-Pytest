@@ -33,9 +33,3 @@ class ProfilePage(BasePage):
             self.image_input.set_input_files(image_path)
         logger.info(f"Обновления профиля с новым Именем: {first_name}, Фамилией: {last_name}, Email: {email}")
         self.save_button.click()
-
-    @allure.step("Проверка поля на обязательное")
-    def is_field_required(self, locator) -> bool:
-        logger.info("Проверка поля на обязательное")
-        return locator.evaluate("el => !el.checkValidity()")
-    

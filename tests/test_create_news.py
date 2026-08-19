@@ -9,6 +9,7 @@ from loguru import logger
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Позитивный")
 @pytest.mark.smoke
+@pytest.mark.ui
 def test_correct_create_article(go_to_create_news_page: CreateNewsPage):
     article = generate_article()
 
@@ -22,6 +23,7 @@ def test_correct_create_article(go_to_create_news_page: CreateNewsPage):
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Позитивный")
 @pytest.mark.regression
+@pytest.mark.ui
 def test_create_article_with_image(go_to_create_news_page: CreateNewsPage):
     article = generate_article()
     with allure.step(f"Поиск image_path для новости с Названием: {article['title']} через /api/news"):
@@ -42,6 +44,7 @@ def test_create_article_with_image(go_to_create_news_page: CreateNewsPage):
 @allure.tag("Негативный")
 @pytest.mark.parametrize("empty_field", ["title", "text"])
 @pytest.mark.regression
+@pytest.mark.ui
 def test_empty_required_field(go_to_create_news_page: CreateNewsPage, empty_field):
     article = generate_article()
     article[empty_field] = ""
@@ -55,6 +58,7 @@ def test_empty_required_field(go_to_create_news_page: CreateNewsPage, empty_fiel
 @allure.tag("Позитивный")
 @pytest.mark.parametrize("empty_field", ["subtitle", "tags"])
 @pytest.mark.regression
+@pytest.mark.ui
 def test_empty_notrequired_field(go_to_create_news_page: CreateNewsPage, empty_field):
     article = generate_article()
     article[empty_field] = ""

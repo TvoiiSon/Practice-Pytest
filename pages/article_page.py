@@ -16,8 +16,3 @@ class ArticlePage(BasePage):
         self.comment_input.fill(text)
         logger.info(f"Создание комментария: {text} для новости с Названием: {self.title}")
         self.submit_comment_button.click()
-
-    @allure.step("Проверка поля на обязательное")
-    def is_field_required(self, locator) -> bool:
-        logger.info("Проверка поля на обязательное")
-        return locator.evaluate("el => !el.checkValidity()")

@@ -31,9 +31,3 @@ class CreateNewsPage(BasePage):
     def open(self):
         logger.info("Переход на страницу создания новости")
         self.page.goto(BASE_URL + "/news/create")
-
-    @allure.step("Проверка поля на обязательное")
-    def is_field_required(self, locator) -> bool:
-        logger.info("Проверка поля на обязательное")
-        return locator.evaluate("el => !el.checkValidity()")
-    

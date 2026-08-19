@@ -9,6 +9,7 @@ from loguru import logger
 @allure.severity(allure.severity_level.NORMAL)
 @allure.tag("Позитивный")
 @pytest.mark.smoke
+@pytest.mark.ui
 def test_correct_count_news(page: Page):
     news_feed_page = NewsFeedPage(page)
     news_feed_page.open()
@@ -18,6 +19,7 @@ def test_correct_count_news(page: Page):
 @allure.severity(allure.severity_level.NORMAL)
 @allure.tag("Позитивный")
 @pytest.mark.smoke
+@pytest.mark.ui
 def test_correct_sorted_news(page: Page):
     with allure.step("Запрос списка новостей: page=1, per_page=10 — проверка сортировки по created_at"):
         logger.info("Запрос списка новостей: page=1, per_page=10 — проверка сортировки по created_at")
@@ -31,6 +33,7 @@ def test_correct_sorted_news(page: Page):
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Позитивный")
 @pytest.mark.smoke
+@pytest.mark.ui
 def test_correct_redirect_article(page: Page):
     news_feed_page = NewsFeedPage(page)
     news_feed_page.open()
@@ -88,6 +91,7 @@ def test_incorrect_per_page_api_article(page: Page, params_per_page):
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Позитивный")
 @pytest.mark.smoke
+@pytest.mark.ui
 def test_correct_change_content(page: Page):
     news_feed_page = NewsFeedPage(page)
     news_feed_page.open()
@@ -104,6 +108,7 @@ def test_correct_change_content(page: Page):
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Позитивный")
 @pytest.mark.smoke
+@pytest.mark.ui
 def test_correct_return_to_first_page(page: Page):
     news_feed_page = NewsFeedPage(page)
     news_feed_page.open()
@@ -124,6 +129,7 @@ def test_correct_return_to_first_page(page: Page):
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Позитивный")
 @pytest.mark.smoke
+@pytest.mark.ui
 def test_correct_change_content_api(page: Page):
     news_feed_page = NewsFeedPage(page)
     news_feed_page.open()
@@ -148,6 +154,7 @@ def test_correct_change_content_api(page: Page):
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Позитивный")
 @pytest.mark.smoke
+@pytest.mark.ui
 def test_correct_search_article(page: Page):
     news_feed_page = NewsFeedPage(page)
     news_feed_page.open()
@@ -163,6 +170,7 @@ def test_correct_search_article(page: Page):
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Негативный")
 @pytest.mark.smoke
+@pytest.mark.ui
 def test_incorrect_search_article(page: Page):
     news_feed_page = NewsFeedPage(page)
     news_feed_page.open()
@@ -176,6 +184,7 @@ def test_incorrect_search_article(page: Page):
 @allure.severity(allure.severity_level.NORMAL)
 @allure.tag("Позитивный")
 @pytest.mark.smoke
+@pytest.mark.ui
 def test_correct_clear_search_article(page: Page):
     news_feed_page = NewsFeedPage(page)
     news_feed_page.open()

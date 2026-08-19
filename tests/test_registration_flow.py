@@ -9,6 +9,7 @@ from helpers.data_generator import generate_user
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Позитивный")
 @pytest.mark.regression
+@pytest.mark.ui
 def test_flow_register_login(page: Page):
     login_page = LoginPage(page)
     register_page = RegisterPage(page)

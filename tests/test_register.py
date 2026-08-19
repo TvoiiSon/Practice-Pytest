@@ -9,6 +9,7 @@ from helpers.data_generator import generate_user
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Позитивный")
 @pytest.mark.smoke
+@pytest.mark.ui
 def test_valid_register(page: Page):
     register_page = RegisterPage(page)
     register_page.open()
@@ -21,6 +22,7 @@ def test_valid_register(page: Page):
 @allure.tag("Негативный")
 @pytest.mark.parametrize("empty_field", ["first_name", "last_name", "email", "password"])
 @pytest.mark.regression
+@pytest.mark.ui
 def test_empty_fields_register(page: Page, empty_field):
     register_page = RegisterPage(page)
     register_page.open()
@@ -34,6 +36,7 @@ def test_empty_fields_register(page: Page, empty_field):
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Негативный")
 @pytest.mark.regression
+@pytest.mark.ui
 def test_invalid_password_register(page: Page):
     register_page = RegisterPage(page)
     register_page.open()
@@ -47,6 +50,7 @@ def test_invalid_password_register(page: Page):
 @allure.tag("Негативный")
 @pytest.mark.parametrize("invalid_email", ["qwe@qwe", "qwe@qwecom"])
 @pytest.mark.regression
+@pytest.mark.ui
 def test_invalid_fields_register(page: Page, invalid_email):
     collected = []
 
@@ -68,6 +72,7 @@ def test_invalid_fields_register(page: Page, invalid_email):
 @allure.severity(allure.severity_level.NORMAL)
 @allure.tag("Позитивный")
 @pytest.mark.regression
+@pytest.mark.ui
 def test_empty_phone_register(page: Page):
     register_page = RegisterPage(page)
     register_page.open()
@@ -80,6 +85,7 @@ def test_empty_phone_register(page: Page):
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Негативный")
 @pytest.mark.regression
+@pytest.mark.ui
 def test_exists_email_register(page: Page):
     register_page = RegisterPage(page)
     register_page.open()
@@ -92,6 +98,7 @@ def test_exists_email_register(page: Page):
 @allure.severity(allure.severity_level.NORMAL)
 @allure.tag("Позитивный")
 @pytest.mark.regression
+@pytest.mark.ui
 def test_to_login(page: Page):
     register_page = RegisterPage(page)
     register_page.open()

@@ -27,11 +27,6 @@ class LoginPage(BasePage):
     def get_error_message(self) -> str:
         return self.page.get_by_text("Incorrect email or password").text_content()
 
-    @allure.step("Проверка поля на обязательное")
-    def is_field_required(self, locator) -> bool:
-        logger.info("Проверка поля на обязательное")
-        return locator.evaluate("el => !el.checkValidity()")
-
     @allure.step("Переход на страницу Регистрации по ссылке внизу формы Авторизации")
     def go_to_register(self):
         logger.info("Переход на страницу Регистрации по ссылке внизу формы Авторизации")

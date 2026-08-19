@@ -10,6 +10,7 @@ from loguru import logger
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Позитивный")
 @pytest.mark.smoke
+@pytest.mark.ui
 def test_valid_update_profile(go_to_profile_page: ProfilePage):
     for_profile = generate_user()
     go_to_profile_page.update_profile(**for_profile)
@@ -18,6 +19,7 @@ def test_valid_update_profile(go_to_profile_page: ProfilePage):
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Позитивный")
 @pytest.mark.smoke
+@pytest.mark.ui
 def test_update_profile_with_set_photo(go_to_profile_page: ProfilePage):
     with allure.step("Запрос /api/users/me с Bearer-токеном — получение photo_path текущего пользователя"):
         for_profile = generate_user()
@@ -35,6 +37,7 @@ def test_update_profile_with_set_photo(go_to_profile_page: ProfilePage):
 @allure.tag("Негативный")
 @pytest.mark.parametrize("empty_field", ["first_name", "last_name", "email"])
 @pytest.mark.regression
+@pytest.mark.ui
 def test_update_profile_without_required_fields(go_to_profile_page: ProfilePage, empty_field):
     for_profile = generate_user()
     for_profile[empty_field] = ""
@@ -46,6 +49,7 @@ def test_update_profile_without_required_fields(go_to_profile_page: ProfilePage,
 @allure.tag("Позитивный")
 @pytest.mark.parametrize("empty_field", ["phone", "password", "image_path"])
 @pytest.mark.regression
+@pytest.mark.ui
 def test_update_profile_without_notrequired_fields(go_to_profile_page: ProfilePage, empty_field):
     for_profile = generate_user()
     if empty_field != "image_path":

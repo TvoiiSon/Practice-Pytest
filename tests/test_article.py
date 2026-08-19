@@ -9,6 +9,7 @@ from loguru import logger
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Позитивный")
 @pytest.mark.smoke
+@pytest.mark.ui
 def test_correct_create_comment(go_to_article_page: ArticlePage):
     comment = generate_comment()
     go_to_article_page.add_comment(comment)
@@ -18,6 +19,7 @@ def test_correct_create_comment(go_to_article_page: ArticlePage):
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Негативный")
 @pytest.mark.regression
+@pytest.mark.ui
 def test_incorrect_create_comment(go_to_article_page: ArticlePage):
     go_to_article_page.add_comment("")
     assert go_to_article_page.is_field_required(go_to_article_page.comment_input)

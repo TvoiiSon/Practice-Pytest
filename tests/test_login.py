@@ -10,6 +10,7 @@ from loguru import logger
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Позитивный")
 @pytest.mark.smoke
+@pytest.mark.ui
 def test_valid_login(page: Page):
     login_page = LoginPage(page)
     login_page.open()
@@ -44,6 +45,7 @@ def test_valid_answer_login_api(page: Page):
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Негативный")
 @pytest.mark.regression
+@pytest.mark.ui
 def test_invalid_login(page: Page):
     login_page = LoginPage(page)
     login_page.open()
@@ -54,6 +56,7 @@ def test_invalid_login(page: Page):
 @allure.tag("Негативный")
 @pytest.mark.parametrize("empty_field", ["email", "password"])
 @pytest.mark.regression
+@pytest.mark.ui
 def test_empty_fields_login(page: Page, empty_field):
     login_page = LoginPage(page)
     login_page.open()
@@ -69,6 +72,7 @@ def test_empty_fields_login(page: Page, empty_field):
 @allure.severity(allure.severity_level.NORMAL)
 @allure.tag("Позитивный")
 @pytest.mark.regression
+@pytest.mark.ui
 def test_logout(authenticated_page: Page):
     header_component = HeaderComponent(authenticated_page)
     header_component.logout()
@@ -77,6 +81,7 @@ def test_logout(authenticated_page: Page):
 @allure.severity(allure.severity_level.NORMAL)
 @allure.tag("Позитивный")
 @pytest.mark.regression
+@pytest.mark.ui
 def test_go_to_register(page: Page):
     login_page = LoginPage(page)
     login_page.open()

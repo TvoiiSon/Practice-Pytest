@@ -32,11 +32,6 @@ class RegisterPage(BasePage):
         logger.info(f"Прохождение регистрации с использованием Имени: {first_name}, Фамилии: {last_name}, Email: {email}")
         self.register_button.click()
 
-    @allure.step("Проверка поля на обязательное")
-    def is_field_required(self, locator) -> bool:
-        logger.info("Проверка поля на обязательное")
-        return locator.evaluate("el => !el.checkValidity()")
-
     @allure.step("Переход на страницу Авторизации по ссылке внизу формы Регистрации")
     def go_to_login(self):
         logger.info("Переход на страницу Авторизации по ссылке внизу формы Регистрации")
