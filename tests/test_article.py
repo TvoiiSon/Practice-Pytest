@@ -14,7 +14,7 @@ def test_correct_create_comment(go_to_article_page: ArticlePage):
     comment = generate_comment()
     go_to_article_page.add_comment(comment)
 
-    expect(go_to_article_page.page.locator("p").get_by_text(comment)).to_be_visible()
+    expect(go_to_article_page.page.locator("p").get_by_text(comment)).to_be_visible(message="Ожидали добавление комментария к новости, но комментарий не добавился")
 
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Негативный")
@@ -22,7 +22,7 @@ def test_correct_create_comment(go_to_article_page: ArticlePage):
 @pytest.mark.ui
 def test_incorrect_create_comment(go_to_article_page: ArticlePage):
     go_to_article_page.add_comment("")
-    assert go_to_article_page.is_field_required(go_to_article_page.comment_input)
+    assert go_to_article_page.is_field_required(go_to_article_page.comment_input), "Поле для содержимого комментария является обязательным для заполнения"
 
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Негативный")
@@ -33,7 +33,7 @@ def test_pii_article_id_returns(page: Page):
         request = page.request.get("https://archiscope.ru/api/news/39/comments").json()
 
         for item in request:
-            assert "email" not in item["author"] and "phone" not in item["author"]
+            assert "email" not in item["author"] and "phone" not in item["author"], "Утечка полей email и phone на странице новости"
 
 @allure.severity(allure.severity_level.NORMAL)
 @allure.tag("Позитивный")
@@ -53,4 +53,4 @@ def test_invalid_article_id_returns_404(page: Page, article_id):
     with allure.step(f"Запрос комментариев несуществующей статьи id={article_id} — ожидаем 404"):
         logger.info(f"Запрос комментариев несуществующей статьи id={article_id} — ожидаем 404")
         request = page.request.get(f"https://archiscope.ru/api/news/{article_id}/comments")
-        assert request.status == 404
+        assert request.status == 404, f"Ожидали получить статус 404, получили {request.status}"

@@ -16,7 +16,7 @@ def test_valid_register(page: Page):
 
     user = generate_user()
     register_page.register(**user)
-    expect(page).to_have_url(BASE_URL + "/login")
+    expect(page, message="После регистрации не произошёл редирект на страницу логина").to_have_url(BASE_URL + "/login")
 
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Негативный")
@@ -31,7 +31,7 @@ def test_empty_fields_register(page: Page, empty_field):
     user[empty_field] = ""
     register_page.register(**user)
     validate_locator = getattr(register_page, f"{empty_field}_input")
-    assert register_page.is_field_required(validate_locator)
+    assert register_page.is_field_required(validate_locator), f"Поле {empty_field} является обязательным для заполнения"
 
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Негативный")
@@ -44,7 +44,7 @@ def test_invalid_password_register(page: Page):
     user = generate_user()
     user["password"] = "12345"
     register_page.register(**user)
-    assert register_page.is_field_required(register_page.password_input)
+    assert register_page.is_field_required(register_page.password_input), "Поле пароля должно быть отмечено как невалидное при слишком коротком пароле"
 
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Негативный")
@@ -67,7 +67,7 @@ def test_invalid_fields_register(page: Page, invalid_email):
 
     page.wait_for_load_state("networkidle")
 
-    assert collected == []
+    assert collected == [], f"Обнаружены JS-ошибки на странице при регистрации с невалидным email: {collected}"
 
 @allure.severity(allure.severity_level.NORMAL)
 @allure.tag("Позитивный")
@@ -80,7 +80,7 @@ def test_empty_phone_register(page: Page):
     user = generate_user()
     user["phone"] = ""
     register_page.register(**user)
-    expect(page).to_have_url(BASE_URL + "/login")
+    expect(page, message="После регистрации с пустым необязательным телефоном не произошёл редирект на страницу логина").to_have_url(BASE_URL + "/login")
 
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Негативный")
@@ -93,7 +93,7 @@ def test_exists_email_register(page: Page):
     user = generate_user()
     user["email"] = "test@example.com"
     register_page.register(**user)
-    expect(page.get_by_text("Email already registered")).to_be_visible()
+    expect(page.get_by_text("Email already registered"), message="Сообщение о том, что email уже зарегистрирован, не появилось").to_be_visible()
 
 @allure.severity(allure.severity_level.NORMAL)
 @allure.tag("Позитивный")
@@ -104,4 +104,4 @@ def test_to_login(page: Page):
     register_page.open()
 
     register_page.go_to_login()
-    expect(page).to_have_url(LoginPage.URL)
+    expect(page, message="Переход по ссылке на страницу авторизации не произошёл").to_have_url(LoginPage.URL)

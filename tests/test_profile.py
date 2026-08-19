@@ -14,7 +14,7 @@ from loguru import logger
 def test_valid_update_profile(go_to_profile_page: ProfilePage):
     for_profile = generate_user()
     go_to_profile_page.update_profile(**for_profile)
-    expect(go_to_profile_page.page.get_by_text("Профиль обновлён")).to_be_visible()
+    expect(go_to_profile_page.page.get_by_text("Профиль обновлён"), message="Сообщение об успешном обновлении профиля не появилось").to_be_visible()
 
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Позитивный")
@@ -31,7 +31,7 @@ def test_update_profile_with_set_photo(go_to_profile_page: ProfilePage):
 
         logger.info(f"Проверка доступности загруженного фото профиля: {BASE_URL + request['photo_path']}")
         second_request = go_to_profile_page.page.request.get(BASE_URL + request["photo_path"])
-        assert second_request.status == 200
+        assert second_request.status == 200, f"Ожидали статус 200 при запросе загруженного фото профиля, получили {second_request.status}"
 
 @allure.severity(allure.severity_level.NORMAL)
 @allure.tag("Негативный")
@@ -43,7 +43,7 @@ def test_update_profile_without_required_fields(go_to_profile_page: ProfilePage,
     for_profile[empty_field] = ""
     go_to_profile_page.update_profile(**for_profile)
     validate_locator = getattr(go_to_profile_page, f"{empty_field}_input")
-    assert go_to_profile_page.is_field_required(validate_locator)
+    assert go_to_profile_page.is_field_required(validate_locator), f"Поле {empty_field} является обязательным для заполнения"
 
 @allure.severity(allure.severity_level.NORMAL)
 @allure.tag("Позитивный")
@@ -55,4 +55,4 @@ def test_update_profile_without_notrequired_fields(go_to_profile_page: ProfilePa
     if empty_field != "image_path":
         for_profile[empty_field] = ""
     go_to_profile_page.update_profile(**for_profile)
-    expect(go_to_profile_page.page.get_by_text("Профиль обновлён")).to_be_visible()
+    expect(go_to_profile_page.page.get_by_text("Профиль обновлён"), message="Сообщение об успешном обновлении профиля не появилось при пустых необязательных полях").to_be_visible()

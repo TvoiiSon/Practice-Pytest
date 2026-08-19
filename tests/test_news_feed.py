@@ -14,7 +14,7 @@ def test_correct_count_news(page: Page):
     news_feed_page = NewsFeedPage(page)
     news_feed_page.open()
 
-    expect(news_feed_page.list_articles).to_have_count(10)
+    expect(news_feed_page.list_articles, message="Ожидали 10 новостей на странице ленты").to_have_count(10)
 
 @allure.severity(allure.severity_level.NORMAL)
 @allure.tag("Позитивный")
@@ -28,7 +28,7 @@ def test_correct_sorted_news(page: Page):
         for item in request["items"]:
             items.append(item["created_at"])
 
-        assert items == sorted(items, reverse=True)
+        assert items == sorted(items, reverse=True), "Новости в ленте отсортированы не по убыванию даты создания"
 
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Позитивный")
@@ -43,7 +43,7 @@ def test_correct_redirect_article(page: Page):
     news_feed_page.open_article(title_article)
     article_page = ArticlePage(page, title_article)
 
-    expect(article_page.heading).to_be_visible()
+    expect(article_page.heading, message="Заголовок статьи не отобразился после перехода по ссылке из ленты").to_be_visible()
 
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Позитивный")
@@ -64,7 +64,7 @@ def test_incorrect_page_api_article(page: Page, params_page):
         logger.info(f"Запрос списка новостей с невалидным page={params_page} — ожидаем 422")
         request = page.request.get(f"https://archiscope.ru/api/news/?page={params_page}&per_page=10")
 
-        assert request.status == 422
+        assert request.status == 422, f"Ожидали статус 422 для невалидного page={params_page}, получили {request.status}"
 
 @allure.severity(allure.severity_level.MINOR)
 @allure.tag("Негативный")
@@ -75,7 +75,7 @@ def test_incorrect_page_api_article_empty(page: Page, params_page):
         logger.info(f"Запрос списка новостей за пределами доступных страниц page={params_page} — ожидаем 200 и пустой items")
         request = page.request.get(f"https://archiscope.ru/api/news/?page={params_page}&per_page=10")
         answer = request.json()
-        assert answer["items"] == [] and request.status == 200
+        assert answer["items"] == [] and request.status == 200, f"Ожидали пустой items и статус 200 для page={params_page} за пределами диапазона, получили status={request.status}, items={answer['items']}"
 
 @allure.severity(allure.severity_level.MINOR)
 @allure.tag("Негативный")
@@ -86,7 +86,7 @@ def test_incorrect_per_page_api_article(page: Page, params_per_page):
         logger.info(f"Запрос списка новостей с невалидным per_page={params_per_page} — ожидаем 422")
         request = page.request.get(f"https://archiscope.ru/api/news/?page=1&per_page={params_per_page}")
 
-        assert request.status == 422
+        assert request.status == 422, f"Ожидали статус 422 для невалидного per_page={params_per_page}, получили {request.status}"
 
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Позитивный")
@@ -95,18 +95,18 @@ def test_incorrect_per_page_api_article(page: Page, params_per_page):
 def test_correct_change_content(page: Page):
     news_feed_page = NewsFeedPage(page)
     news_feed_page.open()
-    expect(news_feed_page.list_articles).to_have_count(10)
+    expect(news_feed_page.list_articles, message="Ожидали 10 новостей на странице ленты").to_have_count(10)
 
     title_article_first = news_feed_page.list_articles.first.text_content()
 
     news_feed_page.go_to_page("2")
 
     try:
-        expect(news_feed_page.list_articles.first).not_to_have_text(title_article_first, timeout=1000)
+        expect(news_feed_page.list_articles.first, message="Контент не сменился после перехода на страницу 2").not_to_have_text(title_article_first, timeout=1000)
     except AssertionError as e:
         logger.warning("Известный баг: клик по пагинации перекрыт фоновым self-refetch, повтор клика")
         news_feed_page.go_to_page("2")
-        expect(news_feed_page.list_articles.first).not_to_have_text(title_article_first)
+        expect(news_feed_page.list_articles.first, message="Контент не сменился после повторного перехода на страницу 2").not_to_have_text(title_article_first)
 
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Позитивный")
@@ -115,26 +115,26 @@ def test_correct_change_content(page: Page):
 def test_correct_return_to_first_page(page: Page):
     news_feed_page = NewsFeedPage(page)
     news_feed_page.open()
-    expect(news_feed_page.list_articles).to_have_count(10)
+    expect(news_feed_page.list_articles, message="Ожидали 10 новостей на странице ленты").to_have_count(10)
 
     title_article_first = news_feed_page.list_articles.first.text_content()
     news_feed_page.go_to_page("2")
 
     try:
-        expect(news_feed_page.list_articles.first).not_to_have_text(title_article_first)
+        expect(news_feed_page.list_articles.first, message="Контент не сменился после перехода на страницу 2").not_to_have_text(title_article_first)
     except AssertionError as e:
             logger.warning("Известный баг: клик по пагинации перекрыт фоновым self-refetch, повтор клика")
             news_feed_page.go_to_page("2")
-            expect(news_feed_page.list_articles.first).not_to_have_text(title_article_first)
+            expect(news_feed_page.list_articles.first, message="Контент не сменился после повторного перехода на страницу 2").not_to_have_text(title_article_first)
 
     news_feed_page.go_to_page("1")
 
     try:
-        expect(news_feed_page.list_articles.first).to_have_text(title_article_first)
+        expect(news_feed_page.list_articles.first, message="После возврата на страницу 1 контент не совпал с исходным").to_have_text(title_article_first)
     except AssertionError as e:
             logger.warning("Известный баг: клик по пагинации перекрыт фоновым self-refetch, повтор клика")
             news_feed_page.go_to_page("1")
-            expect(news_feed_page.list_articles.first).to_have_text(title_article_first)
+            expect(news_feed_page.list_articles.first, message="После повторного возврата на страницу 1 контент не совпал с исходным").to_have_text(title_article_first)
 
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Позитивный")
@@ -143,29 +143,29 @@ def test_correct_return_to_first_page(page: Page):
 def test_correct_change_content_api(page: Page):
     news_feed_page = NewsFeedPage(page)
     news_feed_page.open()
-    expect(news_feed_page.list_articles).to_have_count(10)
+    expect(news_feed_page.list_articles, message="Ожидали 10 новостей на странице ленты").to_have_count(10)
 
     title_article_first = news_feed_page.list_articles.first.text_content()
     with allure.step("Запрос страницы 1 через API — сверка с тем, что показывает UI"):
         logger.info("Запрос страницы 1 через API — сверка с тем, что показывает UI")
         request = page.request.get("https://archiscope.ru/api/news/?page=1&per_page=10").json()
-        assert request["items"][0]["title"] == title_article_first
+        assert request["items"][0]["title"] == title_article_first, f"Первая новость в API (page=1) не совпала с тем, что показано в UI: API={request['items'][0]['title']!r}, UI={title_article_first!r}"
 
-    
+
     news_feed_page.go_to_page("2")
 
     try:
-        expect(news_feed_page.list_articles.first).not_to_have_text(title_article_first)
+        expect(news_feed_page.list_articles.first, message="Контент не сменился после перехода на страницу 2").not_to_have_text(title_article_first)
     except AssertionError as e:
             logger.warning("Известный баг: клик по пагинации перекрыт фоновым self-refetch, повтор клика")
             news_feed_page.go_to_page("2")
-            expect(news_feed_page.list_articles.first).not_to_have_text(title_article_first)
+            expect(news_feed_page.list_articles.first, message="Контент не сменился после повторного перехода на страницу 2").not_to_have_text(title_article_first)
 
     title_article_second = news_feed_page.list_articles.first.text_content()
     with allure.step("Запрос страницы 2 через API — сверка с тем, что показывает UI"):
         logger.info("Запрос страницы 2 через API — сверка с тем, что показывает UI")
         request_s = page.request.get("https://archiscope.ru/api/news/?page=2&per_page=10").json()
-        assert request_s["items"][0]["title"] == title_article_second
+        assert request_s["items"][0]["title"] == title_article_second, f"Первая новость в API (page=2) не совпала с тем, что показано в UI: API={request_s['items'][0]['title']!r}, UI={title_article_second!r}"
 
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Позитивный")
@@ -180,7 +180,7 @@ def test_correct_search_article(page: Page):
     _ = news_feed_page.search(title_before_search)
     title_after_search = news_feed_page.list_articles.first.text_content()
 
-    assert title_before_search == title_after_search
+    assert title_before_search == title_after_search, f"Поиск по полному названию вернул другую новость: искали {title_before_search!r}, получили {title_after_search!r}"
 
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Негативный")
@@ -193,7 +193,7 @@ def test_incorrect_search_article(page: Page):
 
     news_feed_page.search("asdkfjhqwerty12345")
 
-    expect(news_feed_page.notfound_text).to_be_visible()
+    expect(news_feed_page.notfound_text, message="Сообщение 'Ничего не найдено' не появилось при поиске несуществующей новости").to_be_visible()
 
 @allure.severity(allure.severity_level.NORMAL)
 @allure.tag("Позитивный")
@@ -209,7 +209,7 @@ def test_correct_clear_search_article(page: Page):
 
     news_feed_page.clear_search()
 
-    expect(news_feed_page.list_articles).to_have_count(10)
+    expect(news_feed_page.list_articles, message="После очистки поиска не вернулись все 10 новостей").to_have_count(10)
 
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Негативный")
@@ -220,4 +220,4 @@ def test_no_pii_leak_api_article(page: Page):
         request = page.request.get("https://archiscope.ru/api/news/?page=1&per_page=1").json()
 
         for item in request["items"]:
-            assert "email" not in item["author"] and "phone" not in item["author"]
+            assert "email" not in item["author"] and "phone" not in item["author"], "Утечка полей email и phone в списке новостей"

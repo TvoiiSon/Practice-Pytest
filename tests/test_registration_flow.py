@@ -19,8 +19,8 @@ def test_flow_register_login(page: Page):
     user = generate_user()
     register_page.register(**user)
 
-    expect(page).to_have_url(BASE_URL + "/login")
+    expect(page, message="После регистрации не произошёл редирект на страницу логина").to_have_url(BASE_URL + "/login")
 
     login_page.login(user["email"], user["password"])
 
-    expect(login_page.header.avatar_button).to_be_visible()
+    expect(login_page.header.avatar_button, message="Аватар не появился после авторизации новым пользователем").to_be_visible()
