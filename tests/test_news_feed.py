@@ -75,6 +75,24 @@ def test_correct_change_content(page: Page):
     expect(news_feed_page.list_articles.first).not_to_have_text(title_article_first)
 
 @pytest.mark.regression
+def test_correct_return_to_first_page(page: Page):
+    news_feed_page = NewsFeedPage(page)
+    news_feed_page.open()
+    expect(news_feed_page.list_articles).to_have_count(10)
+
+    title_article_first = news_feed_page.list_articles.first.text_content()
+    page.wait_for_timeout(1000)
+    news_feed_page.go_to_page("2")
+    page.wait_for_timeout(1000)
+    expect(news_feed_page.list_articles.first).not_to_have_text(title_article_first)
+
+    page.wait_for_timeout(1000)
+    news_feed_page.go_to_page("1")
+    page.wait_for_timeout(1000)
+
+    expect(news_feed_page.list_articles.first).to_have_text(title_article_first)
+
+@pytest.mark.regression
 def test_correct_change_content_api(page: Page):
     news_feed_page = NewsFeedPage(page)
     news_feed_page.open()
