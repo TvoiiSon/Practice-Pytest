@@ -12,14 +12,25 @@ class ProfilePage(BasePage):
         self.email_input = page.locator('input[name="email"]')
         self.phone_input = page.locator('input[name="phone"]')
         self.password_input = page.locator('input[name="password"]')
+        self.image_input = page.locator('input[type="file"]')
         self.save_button = page.get_by_role("button", name="Сохранить")
 
     def open(self):
         self.page.goto(self.URL)
 
-    def update_phone(self, phone: str):
-        self.phone_input.fill(phone)
+    def update_profile(self, first_name: str, last_name: str, email: str, phone: str = "", password: str = "", image_path: str = ""):
+        self.first_name_input.fill(first_name)
+        self.last_name_input.fill(last_name)
+        self.email_input.fill(email)
+        if phone:
+            self.phone_input.fill(phone)
+        if password:
+            self.password_input.fill(password)
+        if image_path:
+            self.image_input.set_input_files(image_path)
+
         self.save_button.click()
 
-    def is_update_success_visible(self) -> bool:
-        return self.page.get_by_text("Профиль обновлён").is_visible()
+    def is_field_required(self, locator) -> bool:
+        return locator.evaluate("el => !el.checkValidity()")
+    
