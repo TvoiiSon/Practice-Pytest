@@ -1,3 +1,4 @@
+import allure
 from playwright.sync_api import Page
 from pages.base_page import BasePage
 from config import BASE_URL
@@ -19,6 +20,7 @@ class RegisterPage(BasePage):
     def open(self):
         self.page.goto(self.URL)
 
+    @allure.step("Прохождение регистрации с использованием Имени: {first_name}, Фамилии: {last_name}, Email: {email}")
     def register(self, first_name: str, last_name: str, email: str,
                  password: str, phone: str = ""):
         self.first_name_input.fill(first_name)
@@ -30,10 +32,12 @@ class RegisterPage(BasePage):
         logger.info(f"Прохождение регистрации с использованием Имени: {first_name}, Фамилии: {last_name}, Email: {email}")
         self.register_button.click()
 
+    @allure.step("Проверка поля на обязательное")
     def is_field_required(self, locator) -> bool:
         logger.info("Проверка поля на обязательное")
         return locator.evaluate("el => !el.checkValidity()")
 
+    @allure.step("Переход на страницу Авторизации по ссылке внизу формы Регистрации")
     def go_to_login(self):
         logger.info("Переход на страницу Авторизации по ссылке внизу формы Регистрации")
         self.to_login_button.click()

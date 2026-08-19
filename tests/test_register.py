@@ -6,6 +6,7 @@ from pages.register_page import RegisterPage
 from pages.login_page import LoginPage
 from helpers.data_generator import generate_user
 
+@allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Позитивный")
 @pytest.mark.smoke
 def test_valid_register(page: Page):
@@ -16,6 +17,7 @@ def test_valid_register(page: Page):
     register_page.register(**user)
     expect(page).to_have_url(BASE_URL + "/login")
 
+@allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Негативный")
 @pytest.mark.parametrize("empty_field", ["first_name", "last_name", "email", "password"])
 @pytest.mark.regression
@@ -29,6 +31,7 @@ def test_empty_fields_register(page: Page, empty_field):
     validate_locator = getattr(register_page, f"{empty_field}_input")
     assert register_page.is_field_required(validate_locator)
 
+@allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Негативный")
 @pytest.mark.regression
 def test_invalid_password_register(page: Page):
@@ -40,6 +43,7 @@ def test_invalid_password_register(page: Page):
     register_page.register(**user)
     assert register_page.is_field_required(register_page.password_input)
 
+@allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Негативный")
 @pytest.mark.parametrize("invalid_email", ["qwe@qwe", "qwe@qwecom"])
 @pytest.mark.regression
@@ -61,6 +65,7 @@ def test_invalid_fields_register(page: Page, invalid_email):
 
     assert collected == []
 
+@allure.severity(allure.severity_level.NORMAL)
 @allure.tag("Позитивный")
 @pytest.mark.regression
 def test_empty_phone_register(page: Page):
@@ -72,6 +77,7 @@ def test_empty_phone_register(page: Page):
     register_page.register(**user)
     expect(page).to_have_url(BASE_URL + "/login")
 
+@allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Негативный")
 @pytest.mark.regression
 def test_exists_email_register(page: Page):
@@ -83,6 +89,7 @@ def test_exists_email_register(page: Page):
     register_page.register(**user)
     expect(page.get_by_text("Email already registered")).to_be_visible()
 
+@allure.severity(allure.severity_level.NORMAL)
 @allure.tag("Позитивный")
 @pytest.mark.regression
 def test_to_login(page: Page):

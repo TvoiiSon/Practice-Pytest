@@ -1,3 +1,4 @@
+import allure
 from playwright.sync_api import Page
 from pages.base_page import BasePage
 from config import BASE_URL
@@ -19,6 +20,7 @@ class ProfilePage(BasePage):
     def open(self):
         self.page.goto(self.URL)
 
+    @allure.step("Обновления профиля с новым Именем: {first_name}, Фамилией: {last_name}, Email: {email}")
     def update_profile(self, first_name: str, last_name: str, email: str, phone: str = "", password: str = "", image_path: str = ""):
         self.first_name_input.fill(first_name)
         self.last_name_input.fill(last_name)
@@ -32,6 +34,7 @@ class ProfilePage(BasePage):
         logger.info(f"Обновления профиля с новым Именем: {first_name}, Фамилией: {last_name}, Email: {email}")
         self.save_button.click()
 
+    @allure.step("Проверка поля на обязательное")
     def is_field_required(self, locator) -> bool:
         logger.info("Проверка поля на обязательное")
         return locator.evaluate("el => !el.checkValidity()")

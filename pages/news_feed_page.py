@@ -1,3 +1,4 @@
+import allure
 from playwright.sync_api import Page
 from pages.base_page import BasePage
 from pages.create_news_page import CreateNewsPage
@@ -23,22 +24,27 @@ class NewsFeedPage(BasePage):
     def open(self):
         self.page.goto(self.URL)
 
+    @allure.step("Поиск новости с Названием: {query}")
     def search(self, query: str):
         logger.info(f"Поиск новости с Названием: {query}")
         self.search_input.fill(query)
 
+    @allure.step("Нажатие на кнопку очистки формы поиска")
     def clear_search(self):
         logger.info("Нажатие на кнопку очистки формы поиска")
         self.clear_search_button.click()
 
+    @allure.step("Переход на страницу новости, по нажатию на ссылку в Названии: {title}")
     def open_article(self, title: str):
         logger.info(f"Переход на страницу новости, по нажатию на ссылку в Названии: {title}")
         self.page.get_by_role("link", name=title).click()
 
+    @allure.step("Переход на страницу пагинации №{number}")
     def go_to_page(self, number: str):
         logger.info(f"Переход на страницу пагинации №{number}")
         self.page.get_by_role("button", name=number).click()
 
+    @allure.step("Переход на страницу создания новости")
     def open_create_news_page(self) -> CreateNewsPage:
         logger.info("Переход на страницу создания новости")
         with self.page.expect_popup() as popup_info:

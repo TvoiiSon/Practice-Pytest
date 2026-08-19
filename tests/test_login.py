@@ -7,6 +7,7 @@ from pages.header_component import HeaderComponent
 from models.user import User, UserLoginAPIResponse
 from loguru import logger
 
+@allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Позитивный")
 @pytest.mark.smoke
 def test_valid_login(page: Page):
@@ -18,24 +19,29 @@ def test_valid_login(page: Page):
     expect(login_page.header.avatar_button).to_be_visible()
     assert page.evaluate("localStorage.getItem('token')")
 
+@allure.severity(allure.severity_level.NORMAL)
 @allure.tag("Позитивный")
 @pytest.mark.api
 def test_valid_answer_me_api(authenticated_page: Page):
-    token = authenticated_page.evaluate("localStorage.getItem('token')")
+    with allure.step("Запрос /api/users/me с Bearer-токеном — проверка схемы через Pydantic-модель User"):
+        token = authenticated_page.evaluate("localStorage.getItem('token')")
 
-    logger.info("Запрос /api/users/me с Bearer-токеном — проверка схемы через Pydantic-модель User")
-    request = authenticated_page.request.get("https://archiscope.ru/api/users/me", headers={'Authorization': f'Bearer {token}'}).json()
-    assert User(**request)
+        logger.info("Запрос /api/users/me с Bearer-токеном — проверка схемы через Pydantic-модель User")
+        request = authenticated_page.request.get("https://archiscope.ru/api/users/me", headers={'Authorization': f'Bearer {token}'}).json()
+        assert User(**request)
 
+@allure.severity(allure.severity_level.NORMAL)
 @allure.tag("Позитивный")
 @pytest.mark.api
 def test_valid_answer_login_api(page: Page):
-    logger.info("Запрос POST /api/auth/login напрямую, username: test@example.com — проверка статуса и схемы ответа")
-    request = page.request.post(url="https://archiscope.ru/api/auth/login", multipart={"username": "test@example.com", "password": "password123"})
-    assert request.status == 200
-    request = request.json()
-    assert UserLoginAPIResponse(**request)
+    with allure.step("Запрос POST /api/auth/login напрямую, username: test@example.com — проверка статуса и схемы ответа"):
+        logger.info("Запрос POST /api/auth/login напрямую, username: test@example.com — проверка статуса и схемы ответа")
+        request = page.request.post(url="https://archiscope.ru/api/auth/login", multipart={"username": "test@example.com", "password": "password123"})
+        assert request.status == 200
+        request = request.json()
+        assert UserLoginAPIResponse(**request)
 
+@allure.severity(allure.severity_level.CRITICAL)
 @allure.tag("Негативный")
 @pytest.mark.regression
 def test_invalid_login(page: Page):
@@ -44,6 +50,7 @@ def test_invalid_login(page: Page):
     login_page.login("wrong@example.com", "wpassword")
     expect(page.get_by_text("Incorrect email or password")).to_be_visible()
 
+@allure.severity(allure.severity_level.NORMAL)
 @allure.tag("Негативный")
 @pytest.mark.parametrize("empty_field", ["email", "password"])
 @pytest.mark.regression
@@ -59,6 +66,7 @@ def test_empty_fields_login(page: Page, empty_field):
     validate_locator = getattr(login_page, f"{empty_field}_input")
     assert login_page.is_field_required(validate_locator)
 
+@allure.severity(allure.severity_level.NORMAL)
 @allure.tag("Позитивный")
 @pytest.mark.regression
 def test_logout(authenticated_page: Page):
@@ -66,6 +74,7 @@ def test_logout(authenticated_page: Page):
     header_component.logout()
     assert authenticated_page.evaluate("localStorage.getItem('token')") is None
 
+@allure.severity(allure.severity_level.NORMAL)
 @allure.tag("Позитивный")
 @pytest.mark.regression
 def test_go_to_register(page: Page):
