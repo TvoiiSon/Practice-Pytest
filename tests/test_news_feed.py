@@ -133,12 +133,7 @@ def test_correct_change_content(page: Page):
 
     news_feed_page.go_to_page("2")
 
-    try:
-        expect(news_feed_page.list_articles.first, message="Контент не сменился после перехода на страницу 2").not_to_have_text(title_article_first, timeout=1000)
-    except AssertionError:
-        logger.warning("Известный баг: клик по пагинации перекрыт фоновым self-refetch, повтор клика")
-        news_feed_page.go_to_page("2")
-        expect(news_feed_page.list_articles.first, message="Контент не сменился после повторного перехода на страницу 2").not_to_have_text(title_article_first)
+    expect(news_feed_page.list_articles.first, message="Контент не сменился после перехода на страницу 2").not_to_have_text(title_article_first)
 
 @allure.epic("NewsPlatform")
 @allure.feature("Пагинация")
@@ -156,21 +151,10 @@ def test_correct_return_to_first_page(page: Page):
     title_article_first = news_feed_page.list_articles.first.text_content()
     news_feed_page.go_to_page("2")
 
-    try:
-        expect(news_feed_page.list_articles.first, message="Контент не сменился после перехода на страницу 2").not_to_have_text(title_article_first)
-    except AssertionError:
-            logger.warning("Известный баг: клик по пагинации перекрыт фоновым self-refetch, повтор клика")
-            news_feed_page.go_to_page("2")
-            expect(news_feed_page.list_articles.first, message="Контент не сменился после повторного перехода на страницу 2").not_to_have_text(title_article_first)
+    expect(news_feed_page.list_articles.first, message="Контент не сменился после перехода на страницу 2").not_to_have_text(title_article_first)
 
     news_feed_page.go_to_page("1")
-
-    try:
-        expect(news_feed_page.list_articles.first, message="После возврата на страницу 1 контент не совпал с исходным").to_have_text(title_article_first)
-    except AssertionError:
-            logger.warning("Известный баг: клик по пагинации перекрыт фоновым self-refetch, повтор клика")
-            news_feed_page.go_to_page("1")
-            expect(news_feed_page.list_articles.first, message="После повторного возврата на страницу 1 контент не совпал с исходным").to_have_text(title_article_first)
+    expect(news_feed_page.list_articles.first, message="После возврата на страницу 1 контент не совпал с исходным").to_have_text(title_article_first)
 
 @allure.epic("NewsPlatform")
 @allure.feature("Пагинация")
@@ -192,13 +176,7 @@ def test_correct_change_content_api(page: Page):
         assert request["items"][0]["title"] == title_article_first, f"Первая новость в API (page=1) не совпала с тем, что показано в UI: API={request['items'][0]['title']!r}, UI={title_article_first!r}"
 
     news_feed_page.go_to_page("2")
-
-    try:
-        expect(news_feed_page.list_articles.first, message="Контент не сменился после перехода на страницу 2").not_to_have_text(title_article_first)
-    except AssertionError:
-            logger.warning("Известный баг: клик по пагинации перекрыт фоновым self-refetch, повтор клика")
-            news_feed_page.go_to_page("2")
-            expect(news_feed_page.list_articles.first, message="Контент не сменился после повторного перехода на страницу 2").not_to_have_text(title_article_first)
+    expect(news_feed_page.list_articles.first, message="Контент не сменился после перехода на страницу 2").not_to_have_text(title_article_first)
 
     title_article_second = news_feed_page.list_articles.first.text_content()
     with allure.step("Запрос страницы 2 через API — сверка с тем, что показывает UI"):
