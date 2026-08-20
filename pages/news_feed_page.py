@@ -43,7 +43,7 @@ class NewsFeedPage(BasePage):
     @allure.step("Переход на страницу пагинации №{number}")
     def go_to_page(self, number: str):
         logger.info(f"Переход на страницу пагинации №{number}")
-        self.page.get_by_role("button", name=number).click()
+        self.page.get_by_role("button", name=number, exact=True).click()
 
     @allure.step("Переход на страницу создания новости")
     def open_create_news_page(self) -> CreateNewsPage:
